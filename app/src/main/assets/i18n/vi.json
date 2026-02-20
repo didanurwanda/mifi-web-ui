@@ -64,6 +64,13 @@
   "settings.language_title": "Ngôn ngữ",
   "settings.language_label": "Ngôn ngữ ứng dụng",
   "settings.apply_language": "Áp dụng ngôn ngữ",
+  "settings.sms_gateway_title": "Cổng SMS",
+  "settings.sms_gateway_desc": "Cấu hình cổng để gửi SMS tới thiết bị này qua API.",
+  "settings.sms_gateway_token": "Token cổng",
+  "settings.sms_gateway_enable": "Bật cổng SMS",
+  "settings.sms_gateway_howto": "Cách gửi tin nhắn",
+  "settings.sms_gateway_header_hint": "Dùng header: X-Gateway-Token: <token>",
+  "settings.sms_gateway_regenerate": "Tạo lại token",
   "settings.lang_english": "Tiếng Anh",
   "settings.lang_indonesian": "Tiếng Indonesia",
   "footer.copyright": "Copyright 2026 © Dida Nurwanda",
@@ -128,6 +135,9 @@
   "toast.telegram_test_sent": "Đã gửi tin nhắn kiểm tra thành công",
   "toast.telegram_test_failed": "Kiểm tra thất bại",
   "toast.language_saved": "Đã cập nhật ngôn ngữ",
+  "toast.sms_gateway_saved": "Đã lưu cài đặt cổng SMS",
+  "toast.sms_gateway_token_regenerated": "Đã tạo lại token cổng SMS",
+  "toast.sms_gateway_regen_failed": "Không thể tạo lại token cổng SMS",
   "sms.modal_placeholder": "Nội dung tin nhắn đầy đủ...",
   "settings.lang_chinese": "Tiếng Trung",
   "settings.lang_thai": "Tiếng Thái",
@@ -142,5 +152,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }

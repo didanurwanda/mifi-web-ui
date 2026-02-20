@@ -64,6 +64,13 @@
   "settings.language_title": "언어",
   "settings.language_label": "앱 언어",
   "settings.apply_language": "언어 적용",
+  "settings.sms_gateway_title": "SMS 게이트웨이",
+  "settings.sms_gateway_desc": "API로 이 장치에 SMS를 보내기 위한 게이트웨이를 설정합니다.",
+  "settings.sms_gateway_token": "게이트웨이 토큰",
+  "settings.sms_gateway_enable": "SMS 게이트웨이 활성화",
+  "settings.sms_gateway_howto": "메시지 전송 방법",
+  "settings.sms_gateway_header_hint": "헤더 사용: X-Gateway-Token: <token>",
+  "settings.sms_gateway_regenerate": "토큰 재생성",
   "settings.lang_english": "영어",
   "settings.lang_indonesian": "인도네시아어",
   "footer.copyright": "Copyright 2026 © Dida Nurwanda",
@@ -128,6 +135,9 @@
   "toast.telegram_test_sent": "테스트 메시지 전송 성공",
   "toast.telegram_test_failed": "테스트 실패",
   "toast.language_saved": "언어가 업데이트되었습니다",
+  "toast.sms_gateway_saved": "SMS 게이트웨이 설정이 저장되었습니다",
+  "toast.sms_gateway_token_regenerated": "SMS 게이트웨이 토큰이 재생성되었습니다",
+  "toast.sms_gateway_regen_failed": "SMS 게이트웨이 토큰 재생성 실패",
   "sms.modal_placeholder": "전체 메시지 내용...",
   "settings.lang_chinese": "중국어",
   "settings.lang_thai": "태국어",
@@ -142,5 +152,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }

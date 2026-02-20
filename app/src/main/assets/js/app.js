@@ -118,6 +118,15 @@ const App = {
             Settings.saveCallback();
         });
 
+        document.getElementById('sms-gateway-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            Settings.saveSmsGateway();
+        });
+
+        document.getElementById('regen-sms-gateway-btn').addEventListener('click', function() {
+            Settings.regenerateSmsGatewayToken();
+        });
+
         document.getElementById('test-callback-btn').addEventListener('click', function() {
             Settings.testCallback();
         });
@@ -254,11 +263,17 @@ const App = {
             this.switchSMSTab('inbox');
         }
 
-        if (page === 'hotspot') {
+        if (page === 'network') {
             Hotspot.load();
         }
 
-        if (page === 'setting') {
+        if (page === 'tools') {
+            Settings.loadSmsGateway();
+            Settings.loadCallback();
+            Settings.loadTelegram();
+        }
+
+        if (page === 'settings') {
             Settings.loadAll();
         }
     },

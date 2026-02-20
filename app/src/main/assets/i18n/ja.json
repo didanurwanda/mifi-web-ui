@@ -142,5 +142,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }

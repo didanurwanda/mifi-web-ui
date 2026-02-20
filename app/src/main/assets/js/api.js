@@ -208,5 +208,22 @@ const API = {
             method: 'POST',
             body: JSON.stringify({ language: language })
         });
+    },
+
+    async getSmsGateway() {
+        return this.fetch('/sms-gateway');
+    },
+
+    async setSmsGateway(enabled) {
+        return this.fetch('/sms-gateway', {
+            method: 'POST',
+            body: JSON.stringify({ enabled: enabled })
+        });
+    },
+
+    async regenerateSmsGatewayToken() {
+        return this.fetch('/sms-gateway/regenerate', {
+            method: 'POST'
+        });
     }
 };

@@ -64,6 +64,13 @@
   "settings.language_title": "Язык",
   "settings.language_label": "Язык приложения",
   "settings.apply_language": "Применить язык",
+  "settings.sms_gateway_title": "SMS-шлюз",
+  "settings.sms_gateway_desc": "Настройка шлюза для отправки SMS на это устройство через API.",
+  "settings.sms_gateway_token": "Токен шлюза",
+  "settings.sms_gateway_enable": "Включить SMS-шлюз",
+  "settings.sms_gateway_howto": "Как отправить сообщение",
+  "settings.sms_gateway_header_hint": "Используйте заголовок: X-Gateway-Token: <token>",
+  "settings.sms_gateway_regenerate": "Перегенерировать токен",
   "settings.lang_english": "Английский",
   "settings.lang_indonesian": "Индонезийский",
   "footer.copyright": "Copyright 2026 © Dida Nurwanda",
@@ -128,6 +135,9 @@
   "toast.telegram_test_sent": "Тестовое сообщение успешно отправлено",
   "toast.telegram_test_failed": "Тест не удался",
   "toast.language_saved": "Язык обновлен",
+  "toast.sms_gateway_saved": "Настройки SMS-шлюза сохранены",
+  "toast.sms_gateway_token_regenerated": "Токен SMS-шлюза перегенерирован",
+  "toast.sms_gateway_regen_failed": "Не удалось перегенерировать токен SMS-шлюза",
   "sms.modal_placeholder": "Полное содержимое сообщения...",
   "settings.lang_chinese": "Китайский",
   "settings.lang_thai": "Тайский",
@@ -142,5 +152,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }

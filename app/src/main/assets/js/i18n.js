@@ -108,13 +108,14 @@ const I18N = {
         this.applyToSelector('.header-title', 'dashboard.title');
         this.applyToSelector('#logout-btn', 'common.logout');
         this.applyToSelector('#refresh-clients', 'common.refresh');
-        this.applyToSelector('.btn-link[data-page="hotspot"]', 'common.edit');
+        this.applyToSelector('.btn-link[data-page="network"]', 'common.edit');
 
         this.applyToSelector('.sidebar-link[data-page="dashboard"] span:last-child', 'menu.dashboard');
         this.applyToSelector('.sidebar-link[data-page="sms"] span:last-child', 'menu.sms');
-        this.applyToSelector('.sidebar-link[data-page="hotspot"] span:last-child', 'menu.hotspot');
-        this.applyToSelector('.sidebar-link[data-page="password"] span:last-child', 'menu.change_password');
-        this.applyToSelector('.sidebar-link[data-page="setting"] span:last-child', 'menu.settings');
+        this.applyToSelector('.sidebar-link[data-page="network"] span:last-child', 'menu.network');
+        this.applyToSelector('.sidebar-link[data-page="tools"] span:last-child', 'menu.tools');
+        this.applyToSelector('.sidebar-link[data-page="update"] span:last-child', 'menu.update');
+        this.applyToSelector('.sidebar-link[data-page="settings"] span:last-child', 'menu.settings');
 
         this.applyToSelector('#sms-tab-inbox .sms-toolbar .checkbox-label span', 'sms.select_all');
         this.applyToSelector('#sms-tab-outbox .sms-toolbar .checkbox-label span', 'sms.select_all');
@@ -136,7 +137,7 @@ const I18N = {
             labels[1].textContent = this.t('sms.message');
         }
 
-        this.applyToSelector('#page-password .card-header h2', 'password.title');
+        this.applyToSelector('#page-settings .password-card .card-header h2', 'password.title');
         this.applyToSelector('#change-pass-btn .btn-text', 'password.save');
         this.applyPlaceholder('#old-password', 'password.old_placeholder');
         this.applyPlaceholder('#new-password', 'password.new_placeholder');
@@ -151,8 +152,16 @@ const I18N = {
 
         this.applyToSelector('#callback-card-title', 'settings.callback_title');
         this.applyToSelector('#telegram-card-title', 'settings.telegram_title');
+        this.applyToSelector('#sms-gateway-card-title', 'settings.sms_gateway_title');
+        this.applyToSelector('#sms-gateway-desc', 'settings.sms_gateway_desc');
+        this.applyToSelector('#sms-gateway-token-label', 'settings.sms_gateway_token');
+        this.applyToSelector('#sms-gateway-enable-label', 'settings.sms_gateway_enable');
+        this.applyToSelector('#sms-gateway-howto-label', 'settings.sms_gateway_howto');
+        this.applyToSelector('#sms-gateway-header-hint', 'settings.sms_gateway_header_hint');
         this.applyToSelector('#save-callback-btn .btn-text', 'common.save');
         this.applyToSelector('#test-callback-btn .btn-text', 'settings.test_callback');
+        this.applyToSelector('#save-sms-gateway-btn .btn-text', 'common.save');
+        this.applyToSelector('#sms-gateway-regenerate-label', 'settings.sms_gateway_regenerate');
         this.applyToSelector('#save-telegram-btn .btn-text', 'common.save');
         this.applyToSelector('#test-telegram-btn .btn-text', 'settings.test');
         this.applyToSelector('.footer', 'footer.copyright');
@@ -172,7 +181,7 @@ const I18N = {
         }
         this.applyToSelector('.section-title', 'dashboard.connected_devices');
 
-        this.applyToSelector('#page-hotspot .card-header h2', 'hotspot.title');
+        this.applyToSelector('#page-network .card-header h2', 'hotspot.title');
         this.applyToSelector('#save-hotspot-btn .btn-text', 'hotspot.save_changes');
 
         const hotspotLabels = document.querySelectorAll('#hotspot-form .form-group > label:not(.checkbox-label)');
@@ -189,7 +198,7 @@ const I18N = {
         this.applyToSelector('#hotspot-form .checkbox-label span', 'hotspot.broadcast');
         this.applyToSelector('#hotspot-form .checkbox-label + .form-hint', 'hotspot.hidden_hint');
         this.applyToSelector('.hotspot-info .info-label', 'hotspot.connected_clients');
-        this.applyToSelector('#page-hotspot .alert-warning', 'hotspot.alert');
+        this.applyToSelector('#page-network .alert-warning', 'hotspot.alert');
         this.applyPlaceholder('#hotspot-ssid', 'hotspot.ssid_placeholder');
         this.applyPlaceholder('#hotspot-password', 'hotspot.password_placeholder');
 

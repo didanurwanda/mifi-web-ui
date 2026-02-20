@@ -64,6 +64,13 @@
   "settings.language_title": "语言",
   "settings.language_label": "应用语言",
   "settings.apply_language": "应用语言",
+  "settings.sms_gateway_title": "短信网关",
+  "settings.sms_gateway_desc": "配置通过 API 向此设备发送短信的网关。",
+  "settings.sms_gateway_token": "网关令牌",
+  "settings.sms_gateway_enable": "启用短信网关",
+  "settings.sms_gateway_howto": "如何发送短信",
+  "settings.sms_gateway_header_hint": "使用请求头：X-Gateway-Token: <token>",
+  "settings.sms_gateway_regenerate": "重新生成令牌",
   "settings.lang_english": "英语",
   "settings.lang_indonesian": "印尼语",
   "footer.copyright": "Copyright 2026 © Dida Nurwanda",
@@ -128,6 +135,9 @@
   "toast.telegram_test_sent": "测试消息发送成功",
   "toast.telegram_test_failed": "测试失败",
   "toast.language_saved": "语言已更新",
+  "toast.sms_gateway_saved": "短信网关设置已保存",
+  "toast.sms_gateway_token_regenerated": "短信网关令牌已重新生成",
+  "toast.sms_gateway_regen_failed": "重新生成短信网关令牌失败",
   "sms.modal_placeholder": "完整短信内容...",
   "settings.lang_chinese": "中文",
   "settings.lang_thai": "泰语",
@@ -142,5 +152,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }

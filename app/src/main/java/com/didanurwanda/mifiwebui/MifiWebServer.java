@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -102,6 +103,40 @@ public class MifiWebServer extends NanoHTTPD {
                 return jsonResponse("{\"status\":\"error\",\"message\":\"Method not allowed\"}");
             }
 
+            if (uri.equals("/api/sms-gateway/send")) {
+                if (session.getMethod() != Method.POST) {
+                    return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");
+                }
+
+                String number = params.get("number");
+                String message = params.get("message");
+                String gatewayToken = session.getHeaders().get("x-gateway-token");
+                if (gatewayToken == null || gatewayToken.trim().isEmpty()) {
+                    gatewayToken = session.getHeaders().get("authorization");
+                }
+                if (gatewayToken == null || gatewayToken.trim().isEmpty()) {
+                    gatewayToken = params.get("token");
+                }
+
+                Map<String, String> files = new HashMap<>();
+                session.parseBody(files);
+                String postData = files.get("postData");
+                if (postData != null) {
+                    JSONObject json = new JSONObject(postData);
+                    number = json.optString("number", number);
+                    message = json.optString("message", message);
+                    if (gatewayToken == null || gatewayToken.trim().isEmpty()) {
+                        gatewayToken = json.optString("token", "");
+                    }
+                }
+
+                if (gatewayToken != null && gatewayToken.startsWith("Bearer ")) {
+                    gatewayToken = gatewayToken.substring("Bearer ".length()).trim();
+                }
+
+                return jsonResponse(sendSmsViaGateway(gatewayToken, number, message).toString());
+            }
+
             // Di dalam handleApiRequests
             // 2. PROTEKSI TOKEN
             // NanoHTTPD menyimpan header dalam huruf kecil (lowercase)
@@ -165,6 +200,24 @@ public class MifiWebServer extends NanoHTTPD {
                         }
                     }
                     return jsonResponse(sendSms(number, message).toString());
+                case "/api/sms-gateway":
+                    if (session.getMethod() == Method.GET) {
+                        return jsonResponse(getSmsGatewaySettings().toString());
+                    } else if (session.getMethod() == Method.POST) {
+                        Map<String, String> files = new HashMap<>();
+                        session.parseBody(files);
+                        String postData = files.get("postData");
+                        if (postData != null) {
+                            JSONObject json = new JSONObject(postData);
+                            return jsonResponse(setSmsGateway(json).toString());
+                        }
+                    }
+                    return jsonResponse("{\"status\":\"error\",\"message\":\"Method not allowed\"}");
+                case "/api/sms-gateway/regenerate":
+                    if (session.getMethod() == Method.POST) {
+                        return jsonResponse(regenerateSmsGatewayToken().toString());
+                    }
+                    return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");
                 case "/api/sms/delete":
                     if (session.getMethod() == Method.POST) {
                         Map<String, String> files = new HashMap<>();
@@ -378,6 +431,7 @@ public class MifiWebServer extends NanoHTTPD {
             || lang.equals("ru")
             || lang.equals("ja");
     }
+
 
     private String getTetheringSSID() {
         try {
@@ -637,10 +691,93 @@ public class MifiWebServer extends NanoHTTPD {
     public JSONObject sendSms(String n, String m) throws JSONException {
         JSONObject o = new JSONObject();
         try {
+            if (n == null || n.trim().isEmpty() || m == null || m.trim().isEmpty()) {
+                return o.put("status", "error").put("message", "Number and message are required");
+            }
             SmsManager.getDefault().sendTextMessage(n, null, m, null, null);
             o.put("status", "success");
-        } catch (Exception e) { o.put("status", "error"); }
+        } catch (Exception e) {
+            o.put("status", "error");
+            o.put("message", e.getMessage() == null ? "Failed to send SMS" : e.getMessage());
+        }
         return o;
+    }
+
+    public JSONObject getSmsGatewaySettings() throws JSONException {
+        JSONObject result = new JSONObject();
+        String token = prefs.getString("sms_gateway_token", "");
+        if (token.isEmpty()) {
+            token = generateSmsGatewayToken();
+            prefs.edit().putString("sms_gateway_token", token).apply();
+        }
+        result.put("enabled", prefs.getBoolean("sms_gateway_enabled", false));
+        result.put("token", token);
+        result.put("status", "success");
+        return result;
+    }
+
+    public JSONObject setSmsGateway(JSONObject body) throws JSONException {
+        JSONObject result = new JSONObject();
+        try {
+            boolean enabled = body.optBoolean("enabled", false);
+            String token = prefs.getString("sms_gateway_token", "");
+            if (token.isEmpty()) {
+                token = generateSmsGatewayToken();
+            }
+            prefs.edit()
+                .putBoolean("sms_gateway_enabled", enabled)
+                .putString("sms_gateway_token", token)
+                .apply();
+            result.put("status", "success");
+            result.put("enabled", enabled);
+            result.put("token", token);
+        } catch (Exception e) {
+            result.put("status", "error").put("message", e.getMessage());
+        }
+        return result;
+    }
+
+    public JSONObject regenerateSmsGatewayToken() throws JSONException {
+        JSONObject result = new JSONObject();
+        try {
+            String token = generateSmsGatewayToken();
+            prefs.edit().putString("sms_gateway_token", token).apply();
+            result.put("status", "success");
+            result.put("token", token);
+        } catch (Exception e) {
+            result.put("status", "error").put("message", e.getMessage());
+        }
+        return result;
+    }
+
+    public JSONObject sendSmsViaGateway(String token, String number, String message) throws JSONException {
+        JSONObject result = new JSONObject();
+        boolean enabled = prefs.getBoolean("sms_gateway_enabled", false);
+        if (!enabled) {
+            return result.put("status", "error").put("message", "SMS Gateway is disabled");
+        }
+
+        String savedToken = prefs.getString("sms_gateway_token", "");
+        if (savedToken.isEmpty()) {
+            savedToken = generateSmsGatewayToken();
+            prefs.edit().putString("sms_gateway_token", savedToken).apply();
+        }
+
+        if (token == null || token.trim().isEmpty() || !savedToken.equals(token.trim())) {
+            return result.put("status", "error").put("message", "Invalid gateway token");
+        }
+
+        JSONObject smsResult = sendSms(number, message);
+        result.put("status", smsResult.optString("status", "error"));
+        if (smsResult.has("message")) {
+            result.put("message", smsResult.optString("message"));
+        }
+        result.put("number", number == null ? "" : number);
+        return result;
+    }
+
+    private String generateSmsGatewayToken() {
+        return "mifi_" + UUID.randomUUID().toString().replace("-", "");
     }
 
     public JSONObject deleteSms(JSONObject body) throws JSONException {

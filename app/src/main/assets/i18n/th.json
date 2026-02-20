@@ -64,6 +64,13 @@
   "settings.language_title": "ภาษา",
   "settings.language_label": "ภาษาของแอป",
   "settings.apply_language": "ใช้ภาษา",
+  "settings.sms_gateway_title": "SMS Gateway",
+  "settings.sms_gateway_desc": "ตั้งค่าเกตเวย์สำหรับส่ง SMS ไปยังอุปกรณ์นี้ผ่าน API",
+  "settings.sms_gateway_token": "โทเคนเกตเวย์",
+  "settings.sms_gateway_enable": "เปิดใช้งาน SMS Gateway",
+  "settings.sms_gateway_howto": "วิธีส่งข้อความ",
+  "settings.sms_gateway_header_hint": "ใช้เฮดเดอร์: X-Gateway-Token: <token>",
+  "settings.sms_gateway_regenerate": "สร้างโทเคนใหม่",
   "settings.lang_english": "ภาษาอังกฤษ",
   "settings.lang_indonesian": "ภาษาอินโดนีเซีย",
   "footer.copyright": "Copyright 2026 © Dida Nurwanda",
@@ -128,6 +135,9 @@
   "toast.telegram_test_sent": "ส่งข้อความทดสอบสำเร็จ",
   "toast.telegram_test_failed": "ทดสอบไม่สำเร็จ",
   "toast.language_saved": "อัปเดตภาษาแล้ว",
+  "toast.sms_gateway_saved": "บันทึกการตั้งค่า SMS Gateway แล้ว",
+  "toast.sms_gateway_token_regenerated": "สร้างโทเคน SMS Gateway ใหม่แล้ว",
+  "toast.sms_gateway_regen_failed": "สร้างโทเคน SMS Gateway ใหม่ไม่สำเร็จ",
   "sms.modal_placeholder": "เนื้อหาข้อความทั้งหมด...",
   "settings.lang_chinese": "ภาษาจีน",
   "settings.lang_thai": "ภาษาไทย",
@@ -142,5 +152,8 @@
   "settings.lang_name_ko": "한국어",
   "settings.lang_name_vi": "Tiếng Việt",
   "settings.lang_name_ru": "Русский",
-  "settings.lang_name_ja": "日本語"
+  "settings.lang_name_ja": "日本語",
+  "menu.network": "Network",
+  "menu.tools": "Tools",
+  "menu.update": "Update"
 }
