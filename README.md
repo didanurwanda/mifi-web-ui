@@ -2,10 +2,8 @@
 
 ### Screenshots
 
-<img src="images/dashboard.png" alt="Dashboard" width="420" />
-<img src="images/sms-inbox.png" alt="SMS Inbox" width="420" />
-<img src="images/sms-send.png" alt="SMS Send" width="420" />
-<img src="images/settings.png" alt="Settings" width="420" />
+<img src="images/dashboard.png" alt="Dashboard" width="640" />
+<img src="images/sms-inbox.png" alt="SMS Inbox" width="640" />
 
 ## English
 
