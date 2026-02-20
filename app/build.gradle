@@ -1,0 +1,66 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+def keystoreFilePath = System.getenv("KEYSTORE_FILE") ?: project.findProperty("KEYSTORE_FILE")
+def keystorePasswordValue = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD")
+def releaseKeyAlias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS")
+def releaseKeyPassword = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD")
+def hasReleaseSigning = keystoreFilePath && keystorePasswordValue && releaseKeyAlias && releaseKeyPassword
+
+android {
+    namespace 'com.didanurwanda.mifiwebui'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.didanurwanda.mifiwebui"
+        minSdk 19
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(keystoreFilePath)
+                storePassword keystorePasswordValue
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+}
+
+dependencies {
+
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.appcompat
+    implementation libs.material
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.espresso.core
+   implementation files('libs/nanohttpd-2.2.0.jar')
+   implementation 'org.conscrypt:conscrypt-android:2.5.2'
+
+}

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MiFi Web UI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="toast-container"></div>
+
+        <!-- SMS Detail Modal -->
+        <div class="modal-overlay" id="sms-modal" style="display:none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <span class="modal-avatar" id="modal-avatar">85</span>
+                    <div class="modal-info">
+                        <div class="modal-number" id="modal-number">081234567890</div>
+                        <div class="modal-date" id="modal-date">14:30</div>
+                    </div>
+                    <button class="modal-close" id="modal-close">×</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    Full message content here...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Page -->
+        <div id="page-login" class="page">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="login-icon">📶</div>
+                        <h1>MiFi Web UI</h1>
+                        <p>Masukkan password untuk login</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <input type="password" id="login-password" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+                            <span class="btn-text">Login</span>
+                            <span class="btn-loader" style="display:none;"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" style="display:none;">
+            <!-- Header -->
+            <header class="header">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <h1 class="header-title">MiFi Dashboard</h1>
+                <div class="header-spacer"></div>
+            </header>
+
+            <!-- Sidebar Overlay -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-logo">📶</span>
+                    <span class="sidebar-title">MiFi Web UI</span>
+                </div>
+                <ul class="sidebar-menu">
+                    <li><a href="#" data-page="dashboard" class="sidebar-link active">
+                        <span class="sidebar-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a></li>
+                    <li><a href="#" data-page="sms" class="sidebar-link">
+                        <span class="sidebar-icon">💬</span>
+                        <span>SMS</span>
+                    </a></li>
+                    <li><a href="#" data-page="hotspot" class="sidebar-link">
+                        <span class="sidebar-icon">📡</span>
+                        <span>WiFi Hotspot</span>
+                    </a></li>
+                    <li><a href="#" data-page="password" class="sidebar-link">
+                        <span class="sidebar-icon">🔑</span>
+                        <span>Ganti Password</span>
+                    </a></li>
+                    <li><a href="#" data-page="setting" class="sidebar-link">
+                        <span class="sidebar-icon">⚙️</span>
+                        <span>Setting</span>
+                    </a></li>
+                </ul>
+                <div class="sidebar-footer">
+                    <button class="btn btn-danger btn-block" id="logout-btn">Logout</button>
+                </div>
+            </nav>
+
+            <!-- Content -->
+            <main class="content">
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page-content active">
+                    
+                    <!-- Hero Card -->
+                    <div class="hero-card">
+                        
+                        <!-- Main Column -->
+                        <div class="hero-main">
+                            <!-- Status Row -->
+                            <div class="hero-status-row">
+                                <div class="status-item">
+                                    <span class="status-dot" id="internet-dot"></span>
+                                    <div class="status-content">
+                                        <span class="status-value" id="stat-internet">-</span>
+                                        <span class="status-label">Internet</span>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="signal-bars" id="signal-bars">
+                                        <div class="signal-bar"></div>
+                                        <div class="signal-bar"></div>
+                                        <div class="signal-bar"></div>
+                                        <div class="signal-bar"></div>
+                                        <div class="signal-bar"></div>
+                                    </div>
+                                    <div class="status-content">
+                                        <span class="status-value" id="stat-signal">-</span>
+                                        <span class="status-label" id="stat-network-type">-</span>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-icon">🔋</span>
+                                    <div class="status-content">
+                                        <span class="status-value" id="stat-battery">-</span>
+                                        <span class="status-label" id="stat-charging">-</span>
+                                        <span class="status-label" id="stat-temp">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="hero-divider"></div>
+                            
+                            <!-- SSID Section -->
+                            <div class="hero-section">
+                                <div class="section-row">
+                                    <span class="section-icon">📡</span>
+                                    <span class="section-value" id="stat-ssid">-</span>
+                                    <a href="#" data-page="hotspot" class="btn-link">Edit</a>
+                                </div>
+                                <div class="section-row sub-row">
+                                    <span class="section-label">Password:</span>
+                                    <span class="section-value password-value" id="stat-wifi-password">-</span>
+                                    <button class="password-toggle" id="toggle-password" type="button">&#128065;</button>
+                                </div>
+                            </div>
+                            
+                            <div class="hero-divider"></div>
+                            
+                            <!-- Network Info -->
+                            <div class="hero-section hero-row">
+                                <div class="info-item">
+                                    <span class="info-icon">🛰️</span>
+                                    <div class="info-content">
+                                        <span class="info-label">Operator</span>
+                                        <span class="info-value" id="stat-operator">-</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">🌐</span>
+                                    <div class="info-content">
+                                        <span class="info-label">IP Address</span>
+                                        <span class="info-value">
+                                            <span id="stat-local-ip">-</span>
+                                            <span class="ip-sep">/</span>
+                                            <span id="stat-public-ip">-</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="hero-divider"></div>
+                            
+                            <!-- Device Info -->
+                            <div class="hero-section hero-row">
+                                <div class="info-item">
+                                    <span class="info-icon">⏱️</span>
+                                    <div class="info-content">
+                                        <span class="info-label">Uptime</span>
+                                        <span class="info-value" id="stat-uptime">-</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">📱</span>
+                                    <div class="info-content">
+                                        <span class="info-label">Connected</span>
+                                        <span class="info-value" id="stat-clients-count">0 devices</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vertical Divider (Desktop Only) -->
+                        <div class="hero-vdivider"></div>
+                        
+                        <!-- Sidebar Column (Connected Devices) -->
+                        <div class="hero-sidebar">
+                            <div class="hero-section sidebar-section">
+                                <div class="section-header">
+                                    <span class="section-title">Connected Devices</span>
+                                    <button class="btn btn-sm btn-secondary" id="refresh-clients">Refresh</button>
+                                </div>
+                                <div id="clients-list" class="clients-list">
+                                    <div class="loading">Memuat data...</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- SMS Page -->
+                <div id="page-sms" class="page-content">
+                    <div class="sms-tabs">
+                        <button class="sms-tab active" data-tab="inbox">Inbox</button>
+                        <button class="sms-tab" data-tab="outbox">Outbox</button>
+                        <button class="sms-tab" data-tab="compose">Kirim</button>
+                    </div>
+
+                    <!-- Inbox Tab -->
+                    <div id="sms-tab-inbox" class="sms-tab-content active">
+                        <div class="sms-toolbar">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="inbox-select-all">
+                                <span>Pilih Semua</span>
+                            </label>
+                            <div class="sms-toolbar-actions">
+                                <button class="btn btn-sm btn-danger" id="inbox-delete-selected">Hapus Pilihan</button>
+                                <button class="btn btn-sm btn-secondary" id="inbox-delete-all">Hapus Semua</button>
+                            </div>
+                        </div>
+                        <div id="inbox-list" class="sms-list">
+                            <div class="loading">Memuat pesan...</div>
+                        </div>
+                        <div class="pagination">
+                            <button class="btn btn-sm btn-secondary" id="inbox-prev" disabled>Prev</button>
+                            <span id="inbox-page-info">Hal 1/1</span>
+                            <button class="btn btn-sm btn-secondary" id="inbox-next" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Outbox Tab -->
+                    <div id="sms-tab-outbox" class="sms-tab-content">
+                        <div class="sms-toolbar">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="outbox-select-all">
+                                <span>Pilih Semua</span>
+                            </label>
+                            <div class="sms-toolbar-actions">
+                                <button class="btn btn-sm btn-danger" id="outbox-delete-selected">Hapus Pilihan</button>
+                                <button class="btn btn-sm btn-secondary" id="outbox-delete-all">Hapus Semua</button>
+                            </div>
+                        </div>
+                        <div id="outbox-list" class="sms-list">
+                            <div class="loading">Memuat data...</div>
+                        </div>
+                        <div class="pagination">
+                            <button class="btn btn-sm btn-secondary" id="outbox-prev" disabled>Prev</button>
+                            <span id="outbox-page-info">Hal 1/1</span>
+                            <button class="btn btn-sm btn-secondary" id="outbox-next" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Compose Tab -->
+                    <div id="sms-tab-compose" class="sms-tab-content">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="sms-form">
+                                    <div class="form-group">
+                                        <label>Nomor Tujuan</label>
+                                        <input type="tel" id="sms-number" placeholder="08xxxxxxxxxx" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Pesan</label>
+                                        <textarea id="sms-message" placeholder="Tulis pesan..." rows="5" required></textarea>
+                                        <div class="char-count"><span id="sms-char-count">0</span>/160</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block" id="send-sms-btn">
+                                        <span class="btn-text">Kirim SMS</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WiFi Hotspot Page -->
+                <div id="page-hotspot" class="page-content">
+                    <div class="card hotspot-card">
+                        <div class="card-header">
+                            <h2>📡 WiFi Hotspot Settings</h2>
+                            <div id="hotspot-status" class="hotspot-status">-</div>
+                        </div>
+                        <div class="card-body">
+                            <form id="hotspot-form">
+                                <div class="form-group">
+                                    <label>SSID (Nama WiFi)</label>
+                                    <input type="text" id="hotspot-ssid" placeholder="Masukkan nama WiFi" maxlength="32" required>
+                                    <small class="form-hint">Maksimal 32 karakter</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Security</label>
+                                    <select id="hotspot-security" class="form-select">
+                                        <option value="WPA2_PSK">WPA2-PSK (Recommended)</option>
+                                        <option value="WPA_PSK">WPA-PSK</option>
+                                        <option value="OPEN">Open (No Password)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" id="password-group">
+                                    <label>Password</label>
+                                    <div class="password-input-group">
+                                        <input type="password" id="hotspot-password" placeholder="Minimal 8 karakter" maxlength="63">
+                                        <button type="button" class="password-toggle-btn" id="toggle-hotspot-password">&#128065;</button>
+                                    </div>
+                                    <small class="form-hint">Minimal 8 karakter, maksimal 63 karakter</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="hotspot-hidden">
+                                        <span>Broadcast SSID (Visible to all devices)</span>
+                                    </label>
+                                    <small class="form-hint">Jika tidak dicentang, SSID akan tersembunyi</small>
+                                </div>
+                                
+                                <div class="hotspot-info">
+                                    <div class="info-item">
+                                        <span class="info-label">Connected Clients:</span>
+                                        <span class="info-value" id="hotspot-clients">0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-warning">
+                                    &#9888; Mengubah pengaturan akan me-restart hotspot dan memutus semua koneksi.
+                                </div>
+                                
+                                <div class="setting-actions">
+                                    <button type="submit" class="btn btn-primary" id="save-hotspot-btn">
+                                        <span class="btn-text">Simpan Perubahan</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password Page -->
+                <div id="page-password" class="page-content">
+                    <div class="card password-card">
+                        <div class="card-header">
+                            <h2>Ganti Password</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label>Password Lama</label>
+                                    <input type="password" id="old-password" placeholder="Masukkan password lama" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Password Baru</label>
+                                    <input type="password" id="new-password" placeholder="Masukkan password baru" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Konfirmasi Password</label>
+                                    <input type="password" id="confirm-password" placeholder="Ulangi password baru" required>
+                                </div>
+                                <div class="setting-actions">
+                                    <button type="submit" class="btn btn-primary" id="change-pass-btn">
+                                        <span class="btn-text">Simpan Password</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setting Page -->
+                <div id="page-setting" class="page-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="language-card-title">Language</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="language-form">
+                                <div class="form-group">
+                                    <label id="language-label">App Language</label>
+                                    <select id="app-language" class="form-select">
+                                        <option id="language-option-en" value="en">English</option>
+                                        <option id="language-option-id" value="id">Indonesian</option>
+                                        <option id="language-option-zh" value="zh">Chinese</option>
+                                        <option id="language-option-th" value="th">Thai</option>
+                                        <option id="language-option-ko" value="ko">Korean</option>
+                                        <option id="language-option-vi" value="vi">Vietnamese</option>
+                                        <option id="language-option-ru" value="ru">Russian</option>
+                                        <option id="language-option-ja" value="ja">Japanese</option>
+                                    </select>
+                                </div>
+                                <div class="setting-actions">
+                                    <button type="submit" class="btn btn-primary" id="save-language-btn">
+                                        <span class="btn-text">Apply Language</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Callback Webhook</h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="setting-desc">
+                                Callback akan dipanggil secara otomatis saat ada SMS masuk. 
+                                Format: POST JSON dengan body <code>{ address, body, date }</code>
+                            </p>
+                            <form id="callback-form">
+                                <div class="form-group">
+                                    <label>URL Callback</label>
+                                    <input type="url" id="callback-url" placeholder="https://example.com/webhook">
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="callback-enabled" class="sms-checkbox">
+                                        <span>Aktifkan Callback</span>
+                                    </label>
+                                </div>
+                                <div class="setting-actions">
+                                    <button type="submit" class="btn btn-primary" id="save-callback-btn">
+                                        <span class="btn-text">Simpan</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="test-callback-btn">
+                                        <span class="btn-text">Test Callback</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Telegram Forwarder</h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="setting-desc">
+                                Forward SMS masuk ke Telegram. Dapatkan Bot Token dari @BotFather.
+                            </p>
+                            <form id="telegram-form">
+                                <div class="form-group">
+                                    <label>Bot Token</label>
+                                    <input type="text" id="telegram-bot-token" placeholder="123456789:ABCdefGHI...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Chat ID</label>
+                                    <input type="text" id="telegram-chat-id" placeholder="-1001234567890">
+                                </div>
+                                <div class="form-group">
+                                    <label>Identitas Anda (Nomor HP)</label>
+                                    <input type="text" id="telegram-own-number" placeholder="08xxxxxxxxxx">
+                                    <small class="form-hint">Digunakan sebagai info "Ke:" jika nomor tidak terdeteksi otomatis</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="telegram-enabled" class="sms-checkbox">
+                                        <span>Aktifkan Telegram Forwarder</span>
+                                    </label>
+                                </div>
+                                <div class="setting-actions">
+                                    <button type="submit" class="btn btn-primary" id="save-telegram-btn">
+                                        <span class="btn-text">Simpan</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="test-telegram-btn">
+                                        <span class="btn-text">Test</span>
+                                        <span class="btn-loader" style="display:none;"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="footer">
+                    Copyright 2026 &copy; Dida Nurwanda
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/sms.js"></script>
+    <script src="js/hotspot.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
