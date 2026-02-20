@@ -44,7 +44,7 @@
   "password.new_placeholder": "Masukkan password baru",
   "password.confirm_placeholder": "Ulangi password baru",
   "password.save": "Simpan Password",
-  "settings.callback_title": "Callback Webhook",
+  "settings.callback_title": "SMS Callback / Webhook",
   "settings.telegram_title": "Telegram Forwarder",
   "settings.callback_desc": "Callback akan dipanggil secara otomatis saat ada SMS masuk. Format: POST JSON dengan body { address, body, date }",
   "settings.telegram_desc": "Forward SMS masuk ke Telegram. Dapatkan Bot Token dari @BotFather.",

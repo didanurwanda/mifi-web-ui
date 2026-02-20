@@ -419,10 +419,10 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h2>Callback Webhook</h2>
+                            <h2 id="callback-card-title">SMS Callback / Webhook</h2>
                         </div>
                         <div class="card-body">
-                            <p class="setting-desc">
+                            <p class="setting-desc" id="callback-desc">
                                 Callback akan dipanggil secara otomatis saat ada SMS masuk. 
                                 Format: POST JSON dengan body <code>{ address, body, date }</code>
                             </p>
@@ -453,10 +453,10 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h2>Telegram Forwarder</h2>
+                            <h2 id="telegram-card-title">Telegram Forwarder</h2>
                         </div>
                         <div class="card-body">
-                            <p class="setting-desc">
+                            <p class="setting-desc" id="telegram-desc">
                                 Forward SMS masuk ke Telegram. Dapatkan Bot Token dari @BotFather.
                             </p>
                             <form id="telegram-form">

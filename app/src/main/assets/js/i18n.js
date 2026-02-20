@@ -19,7 +19,7 @@ const I18N = {
         const supported = ['en', 'id', 'zh', 'th', 'ko', 'vi', 'ru', 'ja'];
         const target = supported.indexOf(lang) >= 0 ? lang : 'en';
         this.currentLanguage = target;
-        this.dict = await this.loadDict(target);
+        this.dict = await this.buildDict(target);
         this.applyStaticText();
 
         if (saveToServer) {
@@ -40,6 +40,40 @@ const I18N = {
             }
             return {};
         }
+    },
+
+    async buildDict(lang) {
+        if (lang === 'en' || lang === 'id') {
+            return this.loadDict(lang);
+        }
+
+        const [enDict, idDict, targetDict] = await Promise.all([
+            this.loadDict('en'),
+            this.loadDict('id'),
+            this.loadDict(lang)
+        ]);
+
+        const merged = {};
+        const keys = new Set([
+            ...Object.keys(enDict || {}),
+            ...Object.keys(idDict || {}),
+            ...Object.keys(targetDict || {})
+        ]);
+
+        keys.forEach(function(key) {
+            const enVal = enDict ? enDict[key] : undefined;
+            const idVal = idDict ? idDict[key] : undefined;
+            const langVal = targetDict ? targetDict[key] : undefined;
+
+            // If translation is missing or still identical to English, fallback to Indonesian.
+            if (langVal === undefined || langVal === enVal) {
+                merged[key] = idVal !== undefined ? idVal : enVal || key;
+            } else {
+                merged[key] = langVal;
+            }
+        });
+
+        return merged;
     },
 
     t(key, params) {
@@ -115,8 +149,8 @@ const I18N = {
             passLabels[2].textContent = this.t('password.confirm');
         }
 
-        this.applyToSelector('#page-setting .card:nth-child(1) .card-header h2', 'settings.callback_title');
-        this.applyToSelector('#page-setting .card:nth-child(2) .card-header h2', 'settings.telegram_title');
+        this.applyToSelector('#callback-card-title', 'settings.callback_title');
+        this.applyToSelector('#telegram-card-title', 'settings.telegram_title');
         this.applyToSelector('#save-callback-btn .btn-text', 'common.save');
         this.applyToSelector('#test-callback-btn .btn-text', 'settings.test_callback');
         this.applyToSelector('#save-telegram-btn .btn-text', 'common.save');
@@ -159,8 +193,8 @@ const I18N = {
         this.applyPlaceholder('#hotspot-ssid', 'hotspot.ssid_placeholder');
         this.applyPlaceholder('#hotspot-password', 'hotspot.password_placeholder');
 
-        this.applyToSelector('#page-setting .card:nth-child(2) .setting-desc', 'settings.callback_desc');
-        this.applyToSelector('#page-setting .card:nth-child(3) .setting-desc', 'settings.telegram_desc');
+        this.applyToSelector('#callback-desc', 'settings.callback_desc');
+        this.applyToSelector('#telegram-desc', 'settings.telegram_desc');
         this.applyToSelector('#callback-form label:not(.checkbox-label)', 'settings.callback_url');
         this.applyToSelector('#callback-form .checkbox-label span', 'settings.callback_enable');
         this.applyPlaceholder('#callback-url', 'settings.callback_placeholder');

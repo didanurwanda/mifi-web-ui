@@ -44,7 +44,7 @@
   "password.new_placeholder": "Enter new password",
   "password.confirm_placeholder": "Repeat new password",
   "password.save": "Save Password",
-  "settings.callback_title": "Callback Webhook",
+  "settings.callback_title": "SMS Callback / Webhook",
   "settings.telegram_title": "Telegram Forwarder",
   "settings.callback_desc": "Callback will be called automatically when incoming SMS arrives. Format: POST JSON body { address, body, date }",
   "settings.telegram_desc": "Forward incoming SMS to Telegram. Get Bot Token from @BotFather.",
