@@ -64,6 +64,11 @@ After the first launch, the app will auto-run again when the modem reboots.
 
 `http://192.168.100.1:9000`
 
+### Quick Access
+
+- Access URL: **http://192.168.100.1:9000/**
+- Default password: **admin**
+
 ### Update
 
 To update to a newer version, use the same command as first installation (replace the APK file with the new one):  
@@ -136,6 +141,11 @@ Setelah pertama kali dijalankan, aplikasi akan otomatis berjalan lagi saat modem
 
 `http://192.168.100.1:9000`
 
+### Akses Cepat
+
+- URL akses: **http://192.168.100.1:9000/**
+- Password default: **admin**
+
 ### Update
 
 Untuk update ke versi terbaru, caranya sama seperti instalasi pertama (cukup ganti file APK dengan versi terbaru):
@@ -150,25 +160,18 @@ Catatan: perilaku API hotspot, SMS, dan telephony dapat berbeda antar firmware O
 
 ## License / Lisensi
 
-This project is licensed under **GNU AGPL v3.0**. See [`LICENSE`](LICENSE).  
-Project ini menggunakan lisensi **GNU AGPL v3.0**. Lihat file [`LICENSE`](LICENSE).
+This project is licensed under **GNU AGPL v3.0**. See [`LICENSE`](LICENSE).
 
 ## Contribution Rules / Aturan Kontribusi
 
-Contributions are welcome via Issues and Pull Requests.  
-Kontribusi terbuka melalui Issue dan Pull Request.
+Contributions are welcome via Issues and Pull Requests.
 
-- Keep changes focused and easy to review.  
-  Buat perubahan yang fokus dan mudah direview.
-- Explain what was changed and why in the PR description.  
-  Jelaskan apa yang diubah dan alasannya pada deskripsi PR.
-- Test your changes before submitting (at minimum, ensure app/build still works).  
-  Uji perubahan sebelum submit (minimal pastikan aplikasi/build tetap berjalan).
-- Do not include secrets, keystore files, or credentials in commits.  
-  Jangan commit secret, file keystore, atau kredensial.
+- Keep changes focused and easy to review.
+- Explain what was changed and why in the PR description.
+- Test your changes before submitting (at minimum, ensure app/build still works).
+- Do not include secrets, keystore files, or credentials in commits.
 
-Maintainer may request revisions before merge.  
-Maintainer berhak meminta revisi sebelum merge.
+Maintainer may request revisions before merge.
 
 ---
 
