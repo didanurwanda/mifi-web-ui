@@ -12,6 +12,7 @@
   "dashboard.uptime": "稼働時間",
   "dashboard.connected_devices": "接続中のデバイス",
   "dashboard.password": "パスワード:",
+  "dashboard.days": "日",
   "menu.dashboard": "ダッシュボード",
   "menu.sms": "SMS",
   "menu.hotspot": "WiFiホットスポット",

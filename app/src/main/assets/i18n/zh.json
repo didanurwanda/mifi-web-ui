@@ -12,6 +12,7 @@
   "dashboard.uptime": "运行时间",
   "dashboard.connected_devices": "已连接设备",
   "dashboard.password": "密码：",
+  "dashboard.days": "天",
   "menu.dashboard": "仪表盘",
   "menu.sms": "短信",
   "menu.hotspot": "WiFi 热点",

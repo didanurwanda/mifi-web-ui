@@ -1,5 +1,8 @@
 const Dashboard = {
-    intervalId: null,
+    fastIntervalId: null,
+    slowIntervalId: null,
+    uptimeIntervalId: null,
+    uptimeSeconds: 0,
 
     async load() {
         await Promise.all([
@@ -13,19 +16,38 @@ const Dashboard = {
         ]);
     },
 
+    async loadFastData() {
+        await Promise.all([
+            this.loadBattery(),
+            this.loadSignal(),
+            this.loadNetwork()
+        ]);
+    },
+
+    async loadSlowData() {
+        await Promise.all([
+            this.loadOperator(),
+            this.loadIP(),
+            this.loadClients(),
+            this.loadUptime()
+        ]);
+    },
+
     startAutoRefresh() {
         this.stopAutoRefresh();
         var self = this;
-        this.intervalId = setInterval(function() {
-            self.load();
-        }, 30000);
+        this.fastIntervalId = setInterval(function() { self.loadFastData(); }, 5000);
+        this.slowIntervalId = setInterval(function() { self.loadSlowData(); }, 30000);
+        this.uptimeIntervalId = setInterval(function() { self.incrementUptime(); }, 1000);
     },
 
     stopAutoRefresh() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-        }
+        if (this.fastIntervalId) clearInterval(this.fastIntervalId);
+        if (this.slowIntervalId) clearInterval(this.slowIntervalId);
+        if (this.uptimeIntervalId) clearInterval(this.uptimeIntervalId);
+        this.fastIntervalId = null;
+        this.slowIntervalId = null;
+        this.uptimeIntervalId = null;
     },
 
     async loadBattery() {
@@ -37,10 +59,6 @@ const Dashboard = {
                 chargeInfo += ' (' + res.chargeType + ')';
             }
             document.getElementById('stat-charging').textContent = chargeInfo;
-            
-            if (res.temperature !== undefined) {
-                document.getElementById('stat-temp').textContent = res.temperature.toFixed(1) + '\u00B0C';
-            }
         } catch (err) {
             console.error('Battery error:', err);
         }
@@ -151,10 +169,39 @@ const Dashboard = {
     async loadUptime() {
         try {
             var res = await API.getUptime();
-            document.getElementById('stat-uptime').textContent = res.uptime || '-';
+            this.uptimeSeconds = res.uptime_seconds || 0;
+            this.displayUptime();
         } catch (err) {
             console.error('Uptime error:', err);
         }
+    },
+
+    incrementUptime() {
+        this.uptimeSeconds++;
+        this.displayUptime();
+    },
+
+    displayUptime() {
+        var uptimeEl = document.getElementById('stat-uptime');
+        if (!uptimeEl) return;
+        uptimeEl.textContent = this.formatUptime(this.uptimeSeconds);
+    },
+
+    formatUptime(seconds) {
+        var days = Math.floor(seconds / 86400);
+        var hours = Math.floor((seconds % 86400) / 3600);
+        var minutes = Math.floor((seconds % 3600) / 60);
+        var secs = seconds % 60;
+        
+        var timeStr = String(hours).padStart(2, '0') + ':' + 
+                      String(minutes).padStart(2, '0') + ':' + 
+                      String(secs).padStart(2, '0');
+        
+        if (days > 0) {
+            var dayLabel = I18N.t('dashboard.days');
+            return days + ' ' + dayLabel + ', ' + timeStr;
+        }
+        return timeStr;
     },
 
     async loadClients() {

@@ -12,6 +12,7 @@
   "dashboard.uptime": "Время работы",
   "dashboard.connected_devices": "Подключенные устройства",
   "dashboard.password": "Пароль:",
+  "dashboard.days": "дн.",
   "menu.dashboard": "Панель",
   "menu.sms": "SMS",
   "menu.hotspot": "WiFi точка доступа",

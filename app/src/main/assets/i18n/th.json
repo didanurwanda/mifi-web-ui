@@ -12,6 +12,7 @@
   "dashboard.uptime": "เวลาทำงาน",
   "dashboard.connected_devices": "อุปกรณ์ที่เชื่อมต่อ",
   "dashboard.password": "รหัสผ่าน:",
+  "dashboard.days": "วัน",
   "menu.dashboard": "แดชบอร์ด",
   "menu.sms": "SMS",
   "menu.hotspot": "ฮอตสปอต WiFi",
