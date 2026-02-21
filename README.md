@@ -2,10 +2,10 @@
 
 ### Screenshots
 
-|                                                                                                                                |                                                                                                                                |                                                                                                                                |
-| :----------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: |
-| <img width="400" alt="a.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/a1.jpeg"> | <img width="400" alt="b.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/b2.jpeg"> | <img width="400" alt="c.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/c1.jpeg"> |
-| <img width="400" alt="d.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/d2.jpeg"> | <img width="400" alt="e.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/e1.jpeg"> | <img width="400" alt="f.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/f1.jpeg"> |
+| ![i1](images/a1.jpeg?raw=true) | ![i2](images/b2.jpeg?raw=true) | ![i3](images/c1.jpeg?raw=true) |
+|-------------------------------|-------------------------------|-------------------------------|
+| ![i4](images/d2.jpeg?raw=true) | ![i5](images/e1.jpeg?raw=true) | ![i6](images/f1.jpeg?raw=true) |
+
 
 ## English
 
@@ -25,6 +25,7 @@ These SMS capabilities are a major advantage because many stock modem firmwares 
 This project has been tested on:
 
 - MF800 modem
+- H806 modem
 - Mifi with label **Telkomsel 4G LTE**
 - Mifi with label **4G/5G WiFi**
 
@@ -55,7 +56,7 @@ adb devices
 adb install -r ~/Downloads/mifi-webui-xxx.apk
 ```
 
-5. Launch app (optional via ADB shell, first-time setup only).
+5. Launch app (first-time setup only).
 
 ```bash
 adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity
@@ -74,8 +75,7 @@ After the first launch, the app will auto-run again when the modem reboots.
 
 ### Update
 
-To update to a newer version, use the same command as first installation (replace the APK file with the new one):  
-Untuk update ke versi terbaru, gunakan perintah yang sama seperti instalasi awal (ganti file APK dengan versi terbaru):
+To update to a newer version, use the same command as first installation (replace the APK file with the new one):
 
 ```bash
 adb install -r ~/Downloads/mifi-webui-xxx.apk
@@ -104,6 +104,7 @@ Fitur SMS ini adalah nilai utama karena banyak firmware bawaan modem tidak menye
 Project ini sudah diuji pada:
 
 - Modem MF800
+- Modem H806
 - Modem dengan label **Telkomsel 4G LTE**
 - Modem dengan label **4G/5G WiFi**
 
@@ -134,7 +135,7 @@ adb devices
 adb install -r ~/Downloads/mifi-webui-xxx.apk
 ```
 
-5. Jalankan aplikasi (opsional via ADB shell, hanya untuk setup awal).
+5. Jalankan aplikasi (hanya untuk setup awal).
 
 ```bash
 adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity
