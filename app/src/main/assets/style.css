@@ -314,27 +314,10 @@ body {
     visibility: visible;
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 16px;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-.sidebar-logo {
-    font-size: 28px;
-}
-
-.sidebar-title {
-    font-size: 18px;
-    font-weight: 600;
-}
-
 .sidebar-menu {
     list-style: none;
     flex: 1;
-    padding: 8px 0;
+    padding: 0;
 }
 
 .sidebar-link {
@@ -364,8 +347,33 @@ body {
 }
 
 .sidebar-footer {
+    margin-top: auto;
     padding: 16px;
     border-top: 1px solid var(--gray-200);
+}
+
+.sidebar-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--gray-600);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+}
+
+.sidebar-logout-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.sidebar-logout-btn .sidebar-icon {
+    font-size: 18px;
 }
 
 /* Content */
@@ -798,14 +806,6 @@ body {
         margin-left: 280px;
         padding: 32px;
         max-width: 1400px;
-    }
-
-    .sidebar-footer {
-        display: none;
-    }
-
-    .sidebar-link.logout-desktop {
-        display: block;
     }
     
     /* Hero Card Desktop */

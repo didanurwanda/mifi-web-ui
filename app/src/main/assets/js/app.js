@@ -49,7 +49,7 @@ const App = {
             });
         });
 
-        document.getElementById('logout-btn').addEventListener('click', function() {
+        document.getElementById('sidebar-logout-btn').addEventListener('click', function() {
             self.logout();
         });
 

@@ -28,7 +28,7 @@
         </div>
         
         <!-- Login Page -->
-        <div id="page-login" class="page">
+        <div id="page-login" class="page" style="display:none;">
             <div class="login-container">
                 <div class="login-card">
                     <div class="login-header">
@@ -54,7 +54,7 @@
             <!-- Header -->
             <header class="header">
                 <button class="menu-toggle" id="menu-toggle">☰</button>
-                <h1 class="header-title">MiFi Dashboard</h1>
+                <h1 class="header-title">MiFi Web UI</h1>
                 <div class="header-spacer"></div>
             </header>
 
@@ -63,10 +63,6 @@
 
             <!-- Sidebar -->
             <nav class="sidebar" id="sidebar">
-                <div class="sidebar-header">
-                    <span class="sidebar-logo">📶</span>
-                    <span class="sidebar-title">MiFi Web UI</span>
-                </div>
                 <ul class="sidebar-menu">
                     <li><a href="#" data-page="dashboard" class="sidebar-link active">
                         <span class="sidebar-icon">📊</span>
@@ -94,7 +90,10 @@
                     </a></li>
                 </ul>
                 <div class="sidebar-footer">
-                    <button class="btn btn-danger btn-block" id="logout-btn">Logout</button>
+                    <button type="button" class="sidebar-logout-btn" id="sidebar-logout-btn">
+                        <span class="sidebar-icon">🚪</span>
+                        <span id="sidebar-logout-label">Logout</span>
+                    </button>
                 </div>
             </nav>
 

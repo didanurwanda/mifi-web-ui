@@ -105,8 +105,7 @@ const I18N = {
         this.applyToSelector('.login-header p', 'login.subtitle');
         this.applyPlaceholder('#login-password', 'login.password_placeholder');
         this.applyToSelector('#login-btn .btn-text', 'common.login');
-        this.applyToSelector('.header-title', 'dashboard.title');
-        this.applyToSelector('#logout-btn', 'common.logout');
+        this.applyToSelector('#sidebar-logout-label', 'common.logout');
         this.applyToSelector('#refresh-clients', 'common.refresh');
         this.applyToSelector('.btn-link[data-page="network"]', 'common.edit');
 
