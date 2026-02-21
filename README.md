@@ -2,8 +2,10 @@
 
 ### Screenshots
 
-<img src="images/dashboard.png" alt="Dashboard" width="640" />
-<img src="images/sms-inbox.png" alt="SMS Inbox" width="640" />
+|                                                                                                                               |                                                                                                                               |                                                                                                                               |
+| :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------: |
+| <img width="400" alt="a.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/a.jpeg"> | <img width="400" alt="b.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/b.jpeg"> | <img width="400" alt="c.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/c.jpeg"> |
+| <img width="400" alt="d.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/d.jpeg"> | <img width="400" alt="e.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/e.jpeg"> | <img width="400" alt="f.jpeg" src="https://raw.githubusercontent.com/didanurwanda/mifi-web-ui/refs/heads/main/images/f.jpeg"> |
 
 ## English
 
@@ -13,6 +15,7 @@ This project is a Web UI for China ODM 4G LTE WiFi modems running Android 4.4, e
 
 - Full SMS support from Web UI: **Inbox, Outbox, and Send SMS**
 - **SMS Callback/Webhook**: automatically sends incoming SMS data to your HTTP endpoint
+- **SMS Gateway**: SMS delivery via API with token-based security authentication
 - **Telegram Forwarder**: automatically forwards incoming SMS to Telegram
 
 These SMS capabilities are a major advantage because many stock modem firmwares do not provide complete SMS features.
@@ -91,6 +94,7 @@ Project ini adalah Web UI untuk modem WiFi 4G LTE ODM China berbasis Android 4.4
 
 - Dukungan SMS lengkap dari Web UI: **Inbox, Outbox, dan Kirim SMS**
 - **SMS Callback/Webhook**: otomatis mengirim data SMS masuk ke endpoint HTTP Anda
+- **SMS Gateway**: Pengiriman SMS melalui API dengan otentikasi keamanan berbasis token
 - **Telegram Forwarder**: otomatis meneruskan SMS masuk ke Telegram
 
 Fitur SMS ini adalah nilai utama karena banyak firmware bawaan modem tidak menyediakan fitur SMS lengkap.
