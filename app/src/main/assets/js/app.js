@@ -240,6 +240,14 @@ const App = {
     navigateTo(page) {
         this.currentPage = page;
 
+        // Update header title: "MiFi Web UI - Dashboard"
+        var headerTitle = document.querySelector('.header-title');
+        if (headerTitle) {
+            var pageKey = 'menu.' + page;
+            var pageName = I18N.t(pageKey);
+            headerTitle.textContent = 'MiFi Web UI - ' + pageName;
+        }
+
         document.querySelectorAll('.page-content').forEach(function(p) {
             p.classList.remove('active');
         });
