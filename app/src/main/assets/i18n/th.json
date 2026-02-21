@@ -155,5 +155,16 @@
   "settings.lang_name_ja": "日本語",
   "menu.network": "Network",
   "menu.tools": "Tools",
-  "menu.update": "Update"
+  "menu.update": "Update",
+  "update.title": "⬆️ อัปเดต",
+  "update.installed": "เวอร์ชันที่ติดตั้ง",
+  "update.latest": "เวอร์ชันล่าสุด",
+  "update.check": "ตรวจสอบอัปเดต",
+  "update.download": "ดาวน์โหลด APK",
+  "update.available": "มีอัปเดตใหม่",
+  "update.up_to_date": "เป็นเวอร์ชันล่าสุดแล้ว",
+  "update.error": "ข้อผิดพลาด",
+  "update.notes": "บันทึกประกอบรุ่น",
+  "update.howto": "วิธีอัปเดต",
+  "update.instructions_text": "adb install -r mifi-webui-xxx.apk"
 }

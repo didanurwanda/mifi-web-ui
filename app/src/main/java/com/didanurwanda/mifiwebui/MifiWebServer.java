@@ -103,6 +103,16 @@ public class MifiWebServer extends NanoHTTPD {
                 return jsonResponse("{\"status\":\"error\",\"message\":\"Method not allowed\"}");
             }
 
+            if (uri.equals("/api/version")) {
+                try {
+                    String versionName = context.getPackageManager()
+                        .getPackageInfo(context.getPackageName(), 0).versionName;
+                    return jsonResponse("{\"version\":\"" + versionName + "\"}");
+                } catch (Exception e) {
+                    return jsonResponse("{\"version\":\"1.0.0\"}");
+                }
+            }
+
             if (uri.equals("/api/sms-gateway/send")) {
                 if (session.getMethod() != Method.POST) {
                     return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");

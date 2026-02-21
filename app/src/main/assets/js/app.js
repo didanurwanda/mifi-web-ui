@@ -166,6 +166,10 @@ const App = {
         document.getElementById('modal-close').addEventListener('click', function() {
             SMS.closeModal();
         });
+
+        document.getElementById('check-update-btn').addEventListener('click', function() {
+            Update.check();
+        });
     },
 
     async login() {
@@ -275,6 +279,10 @@ const App = {
 
         if (page === 'settings') {
             Settings.loadAll();
+        }
+
+        if (page === 'update') {
+            Update.load();
         }
     },
 

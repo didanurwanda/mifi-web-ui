@@ -363,19 +363,6 @@
                 <div id="page-tools" class="page-content">
                     <div class="card">
                         <div class="card-header">
-                            <h2>🧰 Tools</h2>
-                        </div>
-                        <div class="card-body">
-                            <p class="setting-desc">Fitur tools akan ditambahkan bertahap pada update berikutnya.</p>
-                            <div class="setting-actions">
-                                <button type="button" class="btn btn-secondary" disabled>Auto-Reboot Scheduler (Coming Soon)</button>
-                                <button type="button" class="btn btn-secondary" disabled>Diagnostics (Coming Soon)</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
                             <h2 id="sms-gateway-card-title">SMS Gateway</h2>
                         </div>
                         <div class="card-body">
@@ -494,16 +481,44 @@
                 <div id="page-update" class="page-content">
                     <div class="card">
                         <div class="card-header">
-                            <h2>⬆️ Update</h2>
+                            <h2 id="update-title">⬆️ Update</h2>
                         </div>
                         <div class="card-body">
-                            <p class="setting-desc">OTA-like update helper dari GitHub release akan tersedia pada update berikutnya.</p>
-                            <div class="form-group">
-                                <label>Repository</label>
-                                <input type="text" value="https://github.com/didanurwanda/mifi-web-ui" readonly>
+                            <div class="version-info">
+                                <div class="version-row">
+                                    <span class="version-label" id="update-installed-label">Installed Version</span>
+                                    <span class="version-value" id="update-installed-version">-</span>
+                                </div>
+                                <div class="version-row">
+                                    <span class="version-label" id="update-latest-label">Latest Version</span>
+                                    <span class="version-value" id="update-latest-version">-</span>
+                                </div>
                             </div>
+                            
+                            <div class="update-status" id="update-status-container" style="display:none;">
+                                <span class="status-badge" id="update-status-badge">-</span>
+                            </div>
+                            
                             <div class="setting-actions">
-                                <button type="button" class="btn btn-secondary" disabled>Check Latest Release (Coming Soon)</button>
+                                <button type="button" class="btn btn-primary" id="check-update-btn">
+                                    <span class="btn-text" id="update-check-label">Check for Updates</span>
+                                    <span class="btn-loader" style="display:none;"></span>
+                                </button>
+                                <a href="#" class="btn btn-secondary" id="download-apk-btn" style="display:none;" target="_blank">
+                                    <span class="btn-text" id="update-download-label">Download APK</span>
+                                </a>
+                            </div>
+                            
+                            <div class="release-notes-section" id="release-notes-section" style="display:none;">
+                                <div class="section-divider"></div>
+                                <h3 class="section-subtitle" id="update-notes-label">Release Notes</h3>
+                                <div class="release-body" id="release-body"></div>
+                            </div>
+                            
+                            <div class="update-instructions-section" id="update-instructions-section" style="display:none;">
+                                <div class="section-divider"></div>
+                                <h3 class="section-subtitle" id="update-howto-label">How to Update</h3>
+                                <pre class="code-block" id="update-instructions-text"></pre>
                             </div>
                         </div>
                     </div>
@@ -585,6 +600,7 @@
     <script src="js/sms.js"></script>
     <script src="js/hotspot.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/update.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

@@ -225,5 +225,9 @@ const API = {
         return this.fetch('/sms-gateway/regenerate', {
             method: 'POST'
         });
+    },
+
+    async getAppVersion() {
+        return this.fetch('/version');
     }
 };

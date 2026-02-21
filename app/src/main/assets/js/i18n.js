@@ -240,5 +240,13 @@ const I18N = {
         this.applyToSelector('#language-option-vi', 'settings.lang_name_vi');
         this.applyToSelector('#language-option-ru', 'settings.lang_name_ru');
         this.applyToSelector('#language-option-ja', 'settings.lang_name_ja');
+
+        this.applyToSelector('#update-title', 'update.title');
+        this.applyToSelector('#update-installed-label', 'update.installed');
+        this.applyToSelector('#update-latest-label', 'update.latest');
+        this.applyToSelector('#update-check-label', 'update.check');
+        this.applyToSelector('#update-download-label', 'update.download');
+        this.applyToSelector('#update-notes-label', 'update.notes');
+        this.applyToSelector('#update-howto-label', 'update.howto');
     }
 };
