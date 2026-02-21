@@ -166,5 +166,5 @@
   "update.error": "Lỗi",
   "update.notes": "Ghi chú phát hành",
   "update.howto": "Cách cập nhật",
-  "update.instructions_text": "adb install -r mifi-webui-xxx.apk"
+  "update.instructions_text": "1. Tải file APK từ liên kết trên\n\n2. Kiểm tra ADB đã cài đặt:\n   adb version\n\n3. Kết nối với modem và xác minh:\n   adb devices\n\n4. Cài đặt cập nhật:\n   adb install -r mifi-webui-xxx.apk\n\n5. Khởi động ứng dụng:\n   adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity\n\n6. Xong! Mở http://192.168.100.1:9000"
 }

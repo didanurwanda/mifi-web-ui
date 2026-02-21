@@ -186,5 +186,5 @@
   "update.error": "Error",
   "update.notes": "Catatan Rilis",
   "update.howto": "Cara Update",
-  "update.instructions_text": "adb install -r mifi-webui-xxx.apk"
+  "update.instructions_text": "1. Download file APK dari link di atas\n\n2. Cek ADB sudah terinstall:\n   adb version\n\n3. Hubungkan ke modem dan verifikasi:\n   adb devices\n\n4. Install update:\n   adb install -r mifi-webui-xxx.apk\n\n5. Jalankan aplikasi:\n   adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity\n\n6. Selesai! Buka http://192.168.100.1:9000"
 }

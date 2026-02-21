@@ -166,5 +166,5 @@
   "update.error": "Ошибка",
   "update.notes": "Примечания к выпуску",
   "update.howto": "Как обновить",
-  "update.instructions_text": "adb install -r mifi-webui-xxx.apk"
+  "update.instructions_text": "1. Скачайте APK файл по ссылке выше\n\n2. Проверьте установку ADB:\n   adb version\n\n3. Подключитесь к модему и проверьте:\n   adb devices\n\n4. Установите обновление:\n   adb install -r mifi-webui-xxx.apk\n\n5. Запустите приложение:\n   adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity\n\n6. Готово! Откройте http://192.168.100.1:9000"
 }

@@ -76,6 +76,7 @@ Untuk update ke versi terbaru, gunakan perintah yang sama seperti instalasi awal
 
 ```bash
 adb install -r ~/Downloads/mifi-webui-xxx.apk
+adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity
 ```
 
 Note: hotspot, SMS, and telephony API behavior can vary across ODM firmwares.
@@ -152,17 +153,18 @@ Untuk update ke versi terbaru, caranya sama seperti instalasi pertama (cukup gan
 
 ```bash
 adb install -r ~/Downloads/mifi-webui-xxx.apk
+adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity
 ```
 
 Catatan: perilaku API hotspot, SMS, dan telephony dapat berbeda antar firmware ODM.
 
 ---
 
-## License / Lisensi
+## License
 
 This project is licensed under **GNU AGPL v3.0**. See [`LICENSE`](LICENSE).
 
-## Contribution Rules / Aturan Kontribusi
+## Contribution Rules
 
 Contributions are welcome via Issues and Pull Requests.
 

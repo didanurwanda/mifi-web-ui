@@ -166,5 +166,5 @@
   "update.error": "错误",
   "update.notes": "更新说明",
   "update.howto": "如何更新",
-  "update.instructions_text": "adb install -r mifi-webui-xxx.apk"
+  "update.instructions_text": "1. 从上方链接下载 APK 文件\n\n2. 检查 ADB 是否已安装:\n   adb version\n\n3. 连接到调制解调器并验证:\n   adb devices\n\n4. 安装更新:\n   adb install -r mifi-webui-xxx.apk\n\n5. 启动应用:\n   adb shell am start -n com.didanurwanda.mifiwebui/.MainActivity\n\n6. 完成! 打开 http://192.168.100.1:9000"
 }
