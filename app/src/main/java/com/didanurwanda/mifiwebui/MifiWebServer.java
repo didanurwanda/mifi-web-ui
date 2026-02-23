@@ -557,10 +557,31 @@ public class MifiWebServer extends NanoHTTPD {
     }
 
     private String getSignalJson() {
-        int bars = 0;
-        if (lastSignalStrength >= -90) bars = 4;
-        else if (lastSignalStrength >= -105) bars = 2;
-        else if (lastSignalStrength >= -120) bars = 1;
+        // Salin RSSI dulu agar tidak merusak lastSignalStrength asli
+        int rssi = lastSignalStrength;
+    
+        // Clamp nilai RSSI agar berada di rentang realistis LTE
+        if (rssi > -30) rssi = -30;     // maksimum sinyal LTE realistis
+        if (rssi < -140) rssi = -140;   // minimum sinyal LTE
+    
+        int bars;
+    
+        // Mapping RSSI → 0–5 bar sesuai standar HP LTE
+        if (rssi >= -80) {
+            bars = 5;
+        } else if (rssi >= -90) {
+            bars = 4;
+        } else if (rssi >= -100) {
+            bars = 3;
+        } else if (rssi >= -110) {
+            bars = 2;
+        } else if (rssi >= -120) {
+            bars = 1;
+        } else {
+            bars = 0;
+        }
+    
+        // Kembalikan JSON dengan RSSI asli dan level bar
         return "{\"rssi\": " + lastSignalStrength + ", \"bars\": " + bars + "}";
     }
 
