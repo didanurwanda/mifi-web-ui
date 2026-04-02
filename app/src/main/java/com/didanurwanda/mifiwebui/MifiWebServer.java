@@ -31,9 +31,12 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -665,18 +668,190 @@ public class MifiWebServer extends NanoHTTPD {
     }
 
     private String getConnectedDevices() throws Exception {
+        return new JSONObject().put("clients", getConnectedClientArray()).toString();
+    }
+
+    private JSONArray getConnectedClientArray() throws JSONException {
+        Map<String, JSONObject> leaseClients = readLeaseClients();
+        Map<String, JSONObject> arpClients = readArpClients();
+
+        if (!leaseClients.isEmpty() && !arpClients.isEmpty()) {
+            return toJsonArray(mergeActiveClients(leaseClients, arpClients));
+        }
+
+        if (!leaseClients.isEmpty()) {
+            return toJsonArray(leaseClients);
+        }
+
+        return toJsonArray(arpClients);
+    }
+
+    private Map<String, JSONObject> mergeActiveClients(Map<String, JSONObject> leaseClients, Map<String, JSONObject> arpClients) throws JSONException {
+        Map<String, JSONObject> merged = new LinkedHashMap<>();
+
+        for (Map.Entry<String, JSONObject> entry : arpClients.entrySet()) {
+            String mac = entry.getKey();
+            JSONObject arpClient = entry.getValue();
+            JSONObject client = leaseClients.containsKey(mac)
+                ? new JSONObject(leaseClients.get(mac).toString())
+                : new JSONObject(arpClient.toString());
+
+            client.put("ip", arpClient.optString("ip", client.optString("ip", "-")));
+            client.put("mac", arpClient.optString("mac", mac));
+            client.put("type", client.optString("type", "Wireless"));
+
+            String name = client.optString("name", "*");
+            if (name == null || name.trim().isEmpty()) {
+                client.put("name", "*");
+            }
+
+            merged.put(mac, client);
+        }
+
+        return merged;
+    }
+
+    private JSONArray toJsonArray(Map<String, JSONObject> clients) {
         JSONArray arr = new JSONArray();
-        BufferedReader br = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("cat /proc/net/arp").getInputStream()));
-        String line; br.readLine();
-        while ((line = br.readLine()) != null) {
-            String[] p = line.split("\\s+");
-            if (p.length >= 6 && !p[3].equals("00:00:00:00:00:00")) {
-                JSONObject obj = new JSONObject();
-                obj.put("ip", p[0]); obj.put("mac", p[3]);
-                arr.put(obj);
+        for (JSONObject client : clients.values()) {
+            arr.put(client);
+        }
+        return arr;
+    }
+
+    private Map<String, JSONObject> readLeaseClients() {
+        Map<String, JSONObject> clients = new LinkedHashMap<>();
+        for (String path : getLeaseFilePaths()) {
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("cat " + path).getInputStream()));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] parts = line.trim().split("\\s+");
+                    if (parts.length < 4) {
+                        continue;
+                    }
+
+                    String mac = normalizeMac(parts[1]);
+                    String ip = parts[2];
+                    if (!isValidMac(mac) || !isValidPrivateIp(ip)) {
+                        continue;
+                    }
+
+                    String name = sanitizeLeaseHostname(parts[3]);
+                    JSONObject client = new JSONObject();
+                    client.put("name", name);
+                    client.put("type", "Wireless");
+                    client.put("ip", ip);
+                    client.put("mac", mac);
+                    clients.put(mac, client);
+                }
+            } catch (Exception ignored) {
+            } finally {
+                closeQuietly(br);
             }
         }
-        return new JSONObject().put("clients", arr).toString();
+        return clients;
+    }
+
+    private Map<String, JSONObject> readArpClients() {
+        Map<String, JSONObject> clients = new LinkedHashMap<>();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("cat /proc/net/arp").getInputStream()));
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length < 6) {
+                    continue;
+                }
+
+                String ip = parts[0];
+                String flags = parts[2];
+                String mac = normalizeMac(parts[3]);
+                String device = parts[5];
+
+                if (!"0x2".equals(flags)) {
+                    continue;
+                }
+                if (!isValidMac(mac) || !isValidPrivateIp(ip)) {
+                    continue;
+                }
+                if (!isHotspotClientInterface(device)) {
+                    continue;
+                }
+
+                JSONObject client = new JSONObject();
+                client.put("name", "*");
+                client.put("type", "Wireless");
+                client.put("ip", ip);
+                client.put("mac", mac);
+                clients.put(mac, client);
+            }
+        } catch (Exception ignored) {
+        } finally {
+            closeQuietly(br);
+        }
+        return clients;
+    }
+
+    private List<String> getLeaseFilePaths() {
+        List<String> paths = new ArrayList<>();
+        paths.add("/data/misc/dhcp/dnsmasq.leases");
+        paths.add("/data/misc/apexdata/com.android.tethering/dnsmasq.leases");
+        paths.add("/data/misc/tethering/dnsmasq.leases");
+        return paths;
+    }
+
+    private String sanitizeLeaseHostname(String rawName) {
+        if (rawName == null || rawName.trim().isEmpty()) {
+            return "*";
+        }
+
+        String name = rawName.trim();
+        if ("*".equals(name)) {
+            return "*";
+        }
+        return name;
+    }
+
+    private boolean isValidMac(String mac) {
+        return mac != null
+            && mac.matches("(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$")
+            && !"00:00:00:00:00:00".equals(mac);
+    }
+
+    private String normalizeMac(String mac) {
+        return mac == null ? "" : mac.trim().toLowerCase(Locale.US);
+    }
+
+    private boolean isValidPrivateIp(String ip) {
+        return ip != null && isPrivateIp(ip) && ip.matches("^\\d{1,3}(\\.\\d{1,3}){3}$");
+    }
+
+    private boolean isHotspotClientInterface(String device) {
+        if (device == null) {
+            return false;
+        }
+
+        String iface = device.toLowerCase(Locale.US);
+        return iface.startsWith("wlan")
+            || iface.startsWith("ap")
+            || iface.startsWith("swlan")
+            || iface.startsWith("softap")
+            || iface.startsWith("wl");
+    }
+
+    private void closeQuietly(BufferedReader reader) {
+        if (reader == null) {
+            return;
+        }
+
+        try {
+            reader.close();
+        } catch (IOException ignored) {
+        }
     }
 
 
@@ -1208,21 +1383,10 @@ public class MifiWebServer extends NanoHTTPD {
     }
 
     private int getConnectedClientCount() {
-        int count = 0;
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                Runtime.getRuntime().exec("cat /proc/net/arp").getInputStream()));
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] p = line.split("\\s+");
-                if (p.length >= 6 && !p[3].equals("00:00:00:00:00:00")) {
-                    count++;
-                }
-            }
-            br.close();
+            return getConnectedClientArray().length();
         } catch (Exception ignored) {}
-        return count;
+        return 0;
     }
 
     private javax.net.ssl.SSLSocketFactory getTLSSocketFactory() {

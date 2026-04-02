@@ -252,6 +252,10 @@ const Dashboard = {
         var info = document.createElement('div');
         info.className = 'client-info';
 
+        var name = document.createElement('div');
+        name.className = 'client-name';
+        name.textContent = c && c.name ? String(c.name) : '*';
+
         var ip = document.createElement('div');
         ip.className = 'client-ip';
         ip.textContent = c && c.ip ? String(c.ip) : '-';
@@ -260,6 +264,7 @@ const Dashboard = {
         mac.className = 'client-mac';
         mac.textContent = c && c.mac ? String(c.mac) : '-';
 
+        info.appendChild(name);
         info.appendChild(ip);
         info.appendChild(mac);
         item.appendChild(info);
