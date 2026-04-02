@@ -19,39 +19,71 @@ const SMS = {
         }
 
         var self = this;
-        var html = '';
-        messages.forEach(function(m) {
-            html += '<div class="sms-item" data-id="' + m.id + '" data-number="' + m.number + '" data-date="' + m.date + '" data-body="' + Utils.escapeHtml(m.body) + '">' +
-                '<input type="checkbox" class="sms-checkbox" data-id="' + m.id + '">' +
-                '<div class="sms-avatar">' + Utils.getInitial(m.number) + '</div>' +
-                '<div class="sms-content">' +
-                '<div class="sms-header">' +
-                '<span class="sms-number">' + m.number + '</span>' +
-                '<span class="sms-date">' + Utils.formatDate(m.date) + '</span>' +
-                '</div>' +
-                '<div class="sms-body">' + m.body + '</div>' +
-                '</div></div>';
-        });
-        container.innerHTML = html;
+        container.innerHTML = '';
+        var fragment = document.createDocumentFragment();
 
-        container.querySelectorAll('.sms-item').forEach(function(item) {
+        messages.forEach(function(m) {
+            var id = m && m.id !== undefined && m.id !== null ? String(m.id) : '';
+            var number = m && m.number ? String(m.number) : '-';
+            var rawBody = m && m.body ? String(m.body) : '';
+            var parsedDate = m && m.date ? parseInt(m.date, 10) : NaN;
+            var dateValue = isNaN(parsedDate) ? Date.now() : parsedDate;
+
+            var item = document.createElement('div');
+            item.className = 'sms-item';
+            item.dataset.id = id;
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'sms-checkbox';
+            checkbox.dataset.id = id;
+
+            var avatar = document.createElement('div');
+            avatar.className = 'sms-avatar';
+            avatar.textContent = Utils.getInitial(number);
+
+            var content = document.createElement('div');
+            content.className = 'sms-content';
+
+            var header = document.createElement('div');
+            header.className = 'sms-header';
+
+            var numberEl = document.createElement('span');
+            numberEl.className = 'sms-number';
+            numberEl.textContent = number;
+
+            var dateEl = document.createElement('span');
+            dateEl.className = 'sms-date';
+            dateEl.textContent = Utils.formatDate(dateValue);
+
+            var bodyEl = document.createElement('div');
+            bodyEl.className = 'sms-body';
+            bodyEl.textContent = rawBody;
+
+            header.appendChild(numberEl);
+            header.appendChild(dateEl);
+            content.appendChild(header);
+            content.appendChild(bodyEl);
+
+            item.appendChild(checkbox);
+            item.appendChild(avatar);
+            item.appendChild(content);
+
             item.addEventListener('click', function(e) {
                 if (e.target.classList.contains('sms-checkbox')) {
                     return;
                 }
-                self.showModal(
-                    item.dataset.number,
-                    parseInt(item.dataset.date),
-                    item.dataset.body
-                );
+                self.showModal(number, dateValue, rawBody);
             });
-        });
 
-        container.querySelectorAll('.sms-checkbox').forEach(function(cb) {
-            cb.addEventListener('change', function() {
+            checkbox.addEventListener('change', function() {
                 self.updateSelectAllState(type);
             });
+
+            fragment.appendChild(item);
         });
+
+        container.appendChild(fragment);
     },
 
     async loadInbox() {

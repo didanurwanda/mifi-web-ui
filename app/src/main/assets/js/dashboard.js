@@ -242,20 +242,31 @@ const Dashboard = {
         return;
       }
 
-      var html = '';
+      container.innerHTML = '';
+
+      var fragment = document.createDocumentFragment();
       clients.forEach(function (c) {
-        html +=
-          '<div class="client-item">' +
-          '<div class="client-info">' +
-          '<div class="client-ip">' +
-          c.ip +
-          '</div>' +
-          '<div class="client-mac">' +
-          c.mac +
-          '</div>' +
-          '</div></div>';
+        var item = document.createElement('div');
+        item.className = 'client-item';
+
+        var info = document.createElement('div');
+        info.className = 'client-info';
+
+        var ip = document.createElement('div');
+        ip.className = 'client-ip';
+        ip.textContent = c && c.ip ? String(c.ip) : '-';
+
+        var mac = document.createElement('div');
+        mac.className = 'client-mac';
+        mac.textContent = c && c.mac ? String(c.mac) : '-';
+
+        info.appendChild(ip);
+        info.appendChild(mac);
+        item.appendChild(info);
+        fragment.appendChild(item);
       });
-      container.innerHTML = html;
+
+      container.appendChild(fragment);
     } catch (err) {
       container.innerHTML =
         '<div class="no-data">' +

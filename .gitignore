@@ -23,3 +23,6 @@ key.properties
 # Binary outputs
 *.apk
 *.aab
+
+# Local agent instructions
+AGENTS.md

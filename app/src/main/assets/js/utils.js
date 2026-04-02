@@ -1,16 +1,38 @@
 const Utils = {
+    getCurrentLocale() {
+        var lang = 'en';
+        if (typeof I18N !== 'undefined' && I18N.currentLanguage) {
+            lang = I18N.currentLanguage;
+        }
+
+        var localeMap = {
+            en: 'en-US',
+            id: 'id-ID',
+            zh: 'zh-CN',
+            th: 'th-TH',
+            ko: 'ko-KR',
+            vi: 'vi-VN',
+            ru: 'ru-RU',
+            ja: 'ja-JP'
+        };
+
+        return localeMap[lang] || 'en-US';
+    },
+
     formatDate(timestamp) {
         const date = new Date(timestamp);
         const now = new Date();
         const diff = now - date;
+        const locale = this.getCurrentLocale();
 
         if (diff < 86400000) {
-            return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
         } else if (diff < 604800000) {
-            const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-            return days[date.getDay()] + ' ' + date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const weekday = date.toLocaleDateString(locale, { weekday: 'short' });
+            const time = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+            return weekday + ' ' + time;
         } else {
-            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
         }
     },
 
@@ -22,10 +44,17 @@ const Utils = {
         return number.slice(0, 2).toUpperCase();
     },
 
+    encode(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+
     escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        return this.encode(text);
     },
 
     setButtonLoading(btn, loading) {
