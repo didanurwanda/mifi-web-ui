@@ -15,8 +15,9 @@ import org.json.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class SmsReceiver extends BroadcastReceiver {
 
@@ -35,6 +36,7 @@ public class SmsReceiver extends BroadcastReceiver {
             String telegramBotToken = prefs.getString("telegram_bot_token", "");
             String telegramChatId = prefs.getString("telegram_chat_id", "");
             boolean telegramEnabled = prefs.getBoolean("telegram_enabled", false);
+            String uiLanguage = prefs.getString("ui_language", "en");
 
             if (!callbackEnabled && !telegramEnabled) {
                 Log.d(TAG, "Both callback and telegram disabled");
@@ -71,7 +73,7 @@ public class SmsReceiver extends BroadcastReceiver {
                         }
                         
                         if (telegramEnabled && !telegramBotToken.isEmpty() && !telegramChatId.isEmpty()) {
-                            new TelegramTask(telegramBotToken, telegramChatId, destination, address, body, date).execute();
+                            new TelegramTask(telegramBotToken, telegramChatId, destination, address, body, date, uiLanguage).execute();
                         }
                     }
                 }
@@ -187,28 +189,27 @@ public class SmsReceiver extends BroadcastReceiver {
         private final String fromNumber;
         private final String body;
         private final long date;
+        private final String language;
 
-        TelegramTask(String botToken, String chatId, String ownNumber, String fromNumber, String body, long date) {
+        TelegramTask(String botToken, String chatId, String ownNumber, String fromNumber, String body, long date, String language) {
             this.botToken = botToken;
             this.chatId = chatId;
             this.ownNumber = ownNumber;
             this.fromNumber = fromNumber;
             this.body = body;
             this.date = date;
+            this.language = language;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
             HttpURLConnection conn = null;
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateStr = sdf.format(new Date(date));
-                
-                String message = "📩 [SMS MASUK]\n"
-                    + "Ke: " + ownNumber + "\n"
-                    + "Dari: " + fromNumber + "\n"
-                    + "Waktu: " + dateStr + "\n"
-                    + "Pesan:\n" + body;
+                Locale locale = getLocaleForLanguage(language);
+                DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
+                String dateStr = formatter.format(new Date(date));
+
+                String message = buildTelegramMessage(language, ownNumber, fromNumber, dateStr, body);
                 
                 URL url = new URL("https://api.telegram.org/bot" + botToken + "/sendMessage");
                 conn = (HttpURLConnection) url.openConnection();
@@ -238,6 +239,84 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
             }
             return null;
+        }
+
+        private Locale getLocaleForLanguage(String lang) {
+            if (lang == null) return Locale.ENGLISH;
+            switch (lang) {
+                case "id": return new Locale("id", "ID");
+                case "zh": return Locale.SIMPLIFIED_CHINESE;
+                case "th": return new Locale("th", "TH");
+                case "ko": return Locale.KOREAN;
+                case "vi": return new Locale("vi", "VN");
+                case "ru": return new Locale("ru", "RU");
+                case "ja": return Locale.JAPANESE;
+                default: return Locale.ENGLISH;
+            }
+        }
+
+        private String buildTelegramMessage(String lang, String to, String from, String dateText, String smsBody) {
+            String title;
+            String toLabel;
+            String fromLabel;
+            String timeLabel;
+            String messageLabel;
+
+            if ("id".equals(lang)) {
+                title = "📩 [SMS MASUK]";
+                toLabel = "Ke";
+                fromLabel = "Dari";
+                timeLabel = "Waktu";
+                messageLabel = "Pesan";
+            } else if ("zh".equals(lang)) {
+                title = "📩 [收到短信]";
+                toLabel = "至";
+                fromLabel = "来自";
+                timeLabel = "时间";
+                messageLabel = "消息";
+            } else if ("th".equals(lang)) {
+                title = "📩 [SMS ขาเข้า]";
+                toLabel = "ถึง";
+                fromLabel = "จาก";
+                timeLabel = "เวลา";
+                messageLabel = "ข้อความ";
+            } else if ("ko".equals(lang)) {
+                title = "📩 [수신 SMS]";
+                toLabel = "수신";
+                fromLabel = "발신";
+                timeLabel = "시간";
+                messageLabel = "메시지";
+            } else if ("vi".equals(lang)) {
+                title = "📩 [SMS DEN]";
+                toLabel = "Den";
+                fromLabel = "Tu";
+                timeLabel = "Thoi gian";
+                messageLabel = "Noi dung";
+            } else if ("ru".equals(lang)) {
+                title = "📩 [ВХОДЯЩЕЕ SMS]";
+                toLabel = "Кому";
+                fromLabel = "От";
+                timeLabel = "Время";
+                messageLabel = "Сообщение";
+            } else if ("ja".equals(lang)) {
+                title = "📩 [受信SMS]";
+                toLabel = "宛先";
+                fromLabel = "送信元";
+                timeLabel = "時刻";
+                messageLabel = "本文";
+            } else {
+                title = "📩 [INCOMING SMS]";
+                toLabel = "To";
+                fromLabel = "From";
+                timeLabel = "Time";
+                messageLabel = "Message";
+            }
+
+            return title + "\n"
+                + toLabel + ": " + to + "\n"
+                + fromLabel + ": " + from + "\n"
+                + timeLabel + ": " + dateText + "\n"
+                + messageLabel + ":\n" + smsBody;
         }
     }
 }

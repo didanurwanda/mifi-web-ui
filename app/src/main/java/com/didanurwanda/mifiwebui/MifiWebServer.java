@@ -30,10 +30,11 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -440,6 +441,84 @@ public class MifiWebServer extends NanoHTTPD {
             || lang.equals("vi")
             || lang.equals("ru")
             || lang.equals("ja");
+    }
+
+    private Locale getLocaleForLanguage(String lang) {
+        if (lang == null) return Locale.ENGLISH;
+        switch (lang) {
+            case "id": return new Locale("id", "ID");
+            case "zh": return Locale.SIMPLIFIED_CHINESE;
+            case "th": return new Locale("th", "TH");
+            case "ko": return Locale.KOREAN;
+            case "vi": return new Locale("vi", "VN");
+            case "ru": return new Locale("ru", "RU");
+            case "ja": return Locale.JAPANESE;
+            default: return Locale.ENGLISH;
+        }
+    }
+
+    private String buildTelegramMessage(String lang, String to, String from, String dateText, String smsBody) {
+        String title;
+        String toLabel;
+        String fromLabel;
+        String timeLabel;
+        String messageLabel;
+
+        if ("id".equals(lang)) {
+            title = "📩 [SMS MASUK]";
+            toLabel = "Ke";
+            fromLabel = "Dari";
+            timeLabel = "Waktu";
+            messageLabel = "Pesan";
+        } else if ("zh".equals(lang)) {
+            title = "📩 [收到短信]";
+            toLabel = "至";
+            fromLabel = "来自";
+            timeLabel = "时间";
+            messageLabel = "消息";
+        } else if ("th".equals(lang)) {
+            title = "📩 [SMS ขาเข้า]";
+            toLabel = "ถึง";
+            fromLabel = "จาก";
+            timeLabel = "เวลา";
+            messageLabel = "ข้อความ";
+        } else if ("ko".equals(lang)) {
+            title = "📩 [수신 SMS]";
+            toLabel = "수신";
+            fromLabel = "발신";
+            timeLabel = "시간";
+            messageLabel = "메시지";
+        } else if ("vi".equals(lang)) {
+            title = "📩 [SMS DEN]";
+            toLabel = "Den";
+            fromLabel = "Tu";
+            timeLabel = "Thoi gian";
+            messageLabel = "Noi dung";
+        } else if ("ru".equals(lang)) {
+            title = "📩 [ВХОДЯЩЕЕ SMS]";
+            toLabel = "Кому";
+            fromLabel = "От";
+            timeLabel = "Время";
+            messageLabel = "Сообщение";
+        } else if ("ja".equals(lang)) {
+            title = "📩 [受信SMS]";
+            toLabel = "宛先";
+            fromLabel = "送信元";
+            timeLabel = "時刻";
+            messageLabel = "本文";
+        } else {
+            title = "📩 [INCOMING SMS]";
+            toLabel = "To";
+            fromLabel = "From";
+            timeLabel = "Time";
+            messageLabel = "Message";
+        }
+
+        return title + "\n"
+            + toLabel + ": " + to + "\n"
+            + fromLabel + ": " + from + "\n"
+            + timeLabel + ": " + dateText + "\n"
+            + messageLabel + ":\n" + smsBody;
     }
 
 
@@ -999,15 +1078,18 @@ public class MifiWebServer extends NanoHTTPD {
                 return result.put("status", "error").put("message", "Bot Token atau Chat ID belum diset");
             }
             
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String dateStr = sdf.format(new Date());
-            
-            String message = "📩 [SMS MASUK]\n"
-                + "Ke: YOUR_NUMBER\n"
-                + "Dari: TEST_NUMBER\n"
-                + "Waktu: " + dateStr + "\n"
-                + "Pesan:\n"
-                + "This is a test message from MiFi Web UI";
+            String uiLanguage = prefs.getString("ui_language", "en");
+            Locale locale = getLocaleForLanguage(uiLanguage);
+            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
+            String dateStr = formatter.format(new Date());
+
+            String message = buildTelegramMessage(
+                uiLanguage,
+                "YOUR_NUMBER",
+                "TEST_NUMBER",
+                dateStr,
+                "This is a test message from MiFi Web UI"
+            );
             
             java.net.URL url = new java.net.URL("https://api.telegram.org/bot" + botToken + "/sendMessage");
             java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
