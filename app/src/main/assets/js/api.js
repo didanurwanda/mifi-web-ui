@@ -87,14 +87,28 @@ const API = {
         return this.fetch('/uptime');
     },
 
-    async getSMSInbox(page) {
+    async getSMSInbox(page, query, filter, category) {
         page = page || 1;
-        return this.fetch('/sms/inbox?page=' + page);
+        var endpoint = '/sms/inbox?page=' + page;
+        if (query) {
+            endpoint += '&q=' + encodeURIComponent(query);
+        }
+        if (filter) {
+            endpoint += '&filter=' + encodeURIComponent(filter);
+        }
+        if (category) {
+            endpoint += '&category=' + encodeURIComponent(category);
+        }
+        return this.fetch(endpoint);
     },
 
-    async getSMSOutbox(page) {
+    async getSMSOutbox(page, query) {
         page = page || 1;
-        return this.fetch('/sms/outbox?page=' + page);
+        var endpoint = '/sms/outbox?page=' + page;
+        if (query) {
+            endpoint += '&q=' + encodeURIComponent(query);
+        }
+        return this.fetch(endpoint);
     },
 
     async sendSMS(number, message) {
@@ -122,6 +136,20 @@ const API = {
         return this.fetch('/sms/delete', {
             method: 'POST',
             body: JSON.stringify({ all: true })
+        });
+    },
+
+    async markSMSRead(id) {
+        return this.fetch('/sms/read', {
+            method: 'POST',
+            body: JSON.stringify({ id: id })
+        });
+    },
+
+    async setSMSCategory(id, category) {
+        return this.fetch('/sms/category', {
+            method: 'POST',
+            body: JSON.stringify({ id: id, category: category })
         });
     },
 

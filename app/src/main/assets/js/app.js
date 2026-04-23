@@ -105,7 +105,45 @@ const App = {
         });
 
         document.getElementById('sms-message').addEventListener('input', function(e) {
-            document.getElementById('sms-char-count').textContent = e.target.value.length;
+            SMS.updateComposeStats(e.target.value);
+        });
+
+        document.getElementById('inbox-search').addEventListener('input', function(e) {
+            SMS.onSearchInput('inbox', e.target.value);
+        });
+        document.getElementById('outbox-search').addEventListener('input', function(e) {
+            SMS.onSearchInput('outbox', e.target.value);
+        });
+        document.getElementById('inbox-clear-search').addEventListener('click', function() {
+            SMS.clearSearch('inbox');
+        });
+        document.getElementById('outbox-clear-search').addEventListener('click', function() {
+            SMS.clearSearch('outbox');
+        });
+        document.getElementById('inbox-filter-trigger').addEventListener('click', function(e) {
+            e.stopPropagation();
+            SMS.toggleInboxFilterPanel();
+        });
+        document.getElementById('inbox-filter-panel').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        document.getElementById('inbox-filter-draft').addEventListener('change', function() {
+            SMS.onInboxFilterDraftChange();
+        });
+        document.getElementById('inbox-category-filter-draft').addEventListener('change', function() {
+            SMS.onInboxFilterDraftChange();
+        });
+        document.getElementById('inbox-filter-apply').addEventListener('click', function() {
+            SMS.applyInboxFilters();
+        });
+        document.getElementById('inbox-filter-reset').addEventListener('click', function() {
+            SMS.resetInboxFilters();
+        });
+        document.getElementById('inbox-filter-backdrop').addEventListener('click', function() {
+            SMS.closeInboxFilterPanel();
+        });
+        document.addEventListener('click', function(e) {
+            SMS.handleDocumentClick(e);
         });
 
         document.getElementById('password-form').addEventListener('submit', function(e) {
@@ -165,6 +203,15 @@ const App = {
         });
         document.getElementById('modal-close').addEventListener('click', function() {
             SMS.closeModal();
+        });
+        document.getElementById('modal-delete-btn').addEventListener('click', function() {
+            SMS.deleteActiveMessage();
+        });
+        document.getElementById('modal-reply-btn').addEventListener('click', function() {
+            SMS.replyToActiveMessage();
+        });
+        document.getElementById('modal-category-select').addEventListener('change', function(e) {
+            SMS.setActiveCategory(e.target.value);
         });
 
         document.getElementById('check-update-btn').addEventListener('click', function() {
@@ -296,6 +343,7 @@ const App = {
 
     switchSMSTab(tab) {
         SMS.currentTab = tab;
+        SMS.closeInboxFilterPanel();
 
         document.querySelectorAll('.sms-tab').forEach(function(t) {
             t.classList.remove('active');
@@ -310,10 +358,16 @@ const App = {
         if (tab === 'inbox') SMS.loadInbox();
         if (tab === 'outbox') SMS.loadOutbox();
         if (tab === 'compose') {
-            document.getElementById('sms-number').value = '';
-            document.getElementById('sms-message').value = '';
-            document.getElementById('sms-char-count').textContent = '0';
+            SMS.updateComposeStats(document.getElementById('sms-message').value);
         }
+    },
+
+    openSMSCompose(number) {
+        this.switchSMSTab('compose');
+        if (number) {
+            document.getElementById('sms-number').value = number;
+        }
+        SMS.updateComposeStats(document.getElementById('sms-message').value);
     },
 
     async changePassword() {

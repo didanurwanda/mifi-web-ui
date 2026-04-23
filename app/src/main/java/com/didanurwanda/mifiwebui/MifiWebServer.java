@@ -1,6 +1,7 @@
 package com.didanurwanda.mifiwebui;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -44,6 +45,52 @@ import java.util.UUID;
 import fi.iki.elonen.NanoHTTPD;
 
 public class MifiWebServer extends NanoHTTPD {
+
+    private static final String SMS_CATEGORY_PREFIX = "sms_category_";
+    private static final String CATEGORY_ALL = "all";
+    private static final String CATEGORY_MARKETING = "marketing";
+    private static final String CATEGORY_OTP = "otp";
+    private static final String CATEGORY_PERSONAL = "personal";
+    private static final String CATEGORY_UNKNOWN = "unknown";
+    private static final String CATEGORY_SOURCE_AUTO = "auto";
+    private static final String CATEGORY_SOURCE_MANUAL = "manual";
+    private static final int CLASSIFICATION_STRONG_SCORE = 3;
+    private static final int CLASSIFICATION_SUPPORT_SCORE = 1;
+    private static final int OTP_SCORE_THRESHOLD = 3;
+    private static final int MARKETING_SCORE_THRESHOLD = 3;
+
+    // SMS classification keywords are grouped here so the scoring helpers stay compact.
+    private static final String[] OTP_STRONG_KEYWORDS = new String[]{
+        "otp", "one-time password", "one time password", "verification code", "security code",
+        "auth code", "passcode", "login code", "activation code", "kode otp",
+        "kode verifikasi", "kode keamanan", "kode login", "kod pengesahan",
+        "codigo de verificacion", "codigo de verificacao", "code de verification",
+        "verifizierungscode", "код подтверждения", "код проверки", "رمز التحقق",
+        "सत्यापन कोड", "รหัสยืนยัน", "ma xac minh", "验证码", "認証コード", "인증번호"
+    };
+    private static final String[] OTP_SUPPORTING_KEYWORDS = new String[]{
+        "verify", "verification", "verifikasi", "confirm", "login", "signin", "sign in",
+        "password", "pin", "mpin", "tac", "do not share", "jangan bagikan",
+        "jangan berikan", "valid for", "expires in", "reset password", "security",
+        "account", "identity", "confirm identity"
+    };
+    private static final String[] OTP_PROTECTIVE_PHRASES = new String[]{
+        "do not share", "never share", "jangan bagikan", "jangan berikan", "keep this code private"
+    };
+    private static final String[] MARKETING_STRONG_KEYWORDS = new String[]{
+        "promo", "promotion", "discount", "diskon", "cashback", "special offer",
+        "limited time offer", "flash sale", "voucher", "coupon", "kupon", "gratis",
+        "free shipping", "belanja sekarang", "shop now", "promocion", "descuento",
+        "oferta", "promocao", "reduction", "angebot", "rabatt", "скидка", "акция",
+        "предложение", "عرض", "خصم", "โปรโมชั่น", "ส่วนลด", "khuyen mai", "giam gia",
+        "优惠", "折扣", "促销", "割引", "キャンペーン", "할인", "프로모션"
+    };
+    private static final String[] MARKETING_SUPPORTING_KEYWORDS = new String[]{
+        "bonus", "reward", "points", "redeem", "claim now", "save more", "exclusive",
+        "member", "event", "new arrival", "sale", "ongkir", "limited", "member only",
+        "claim", "tebus", "shopping", "top up bonus", "free gift", "buy 1 get 1",
+        "bogo", "order now", "visit now", "special", "offer"
+    };
 
     private final Context context;
     private final SharedPreferences prefs;
@@ -195,11 +242,18 @@ public class MifiWebServer extends NanoHTTPD {
                     serverToken = ""; // Force logout setelah ganti password
                     return jsonResponse("{\"status\":\"success\"}");
                 case "/api/sms/inbox":
-                    int p = Integer.parseInt(params.get("page") != null ? params.get("page") : "1");
-                    return jsonResponse(getInboxJson(context, p, 20).toString());
+                    int p = parsePageParam(params.get("page"));
+                    return jsonResponse(getInboxJson(
+                        context,
+                        p,
+                        20,
+                        params.get("q"),
+                        params.get("filter"),
+                        params.get("category")
+                    ).toString());
                 case "/api/sms/outbox":
-                    int pOut = Integer.parseInt(params.get("page") != null ? params.get("page") : "1");
-                    return jsonResponse(getOutboxJson(context, pOut, 20).toString());
+                    int pOut = parsePageParam(params.get("page"));
+                    return jsonResponse(getOutboxJson(context, pOut, 20, params.get("q")).toString());
                 case "/api/sms/send":
                     String number = params.get("number");
                     String message = params.get("message");
@@ -240,6 +294,28 @@ public class MifiWebServer extends NanoHTTPD {
                         if (postData != null) {
                             JSONObject json = new JSONObject(postData);
                             return jsonResponse(deleteSms(json).toString());
+                        }
+                    }
+                    return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");
+                case "/api/sms/read":
+                    if (session.getMethod() == Method.POST) {
+                        Map<String, String> files = new HashMap<>();
+                        session.parseBody(files);
+                        String postData = files.get("postData");
+                        if (postData != null) {
+                            JSONObject json = new JSONObject(postData);
+                            return jsonResponse(markSmsAsRead(json).toString());
+                        }
+                    }
+                    return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");
+                case "/api/sms/category":
+                    if (session.getMethod() == Method.POST) {
+                        Map<String, String> files = new HashMap<>();
+                        session.parseBody(files);
+                        String postData = files.get("postData");
+                        if (postData != null) {
+                            JSONObject json = new JSONObject(postData);
+                            return jsonResponse(setSmsCategory(json).toString());
                         }
                     }
                     return jsonResponse("{\"status\":\"error\",\"message\":\"POST required\"}");
@@ -301,6 +377,16 @@ public class MifiWebServer extends NanoHTTPD {
             }
         } catch (Exception e) {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "application/json", "{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+
+    private int parsePageParam(String rawPage) {
+        try {
+            int page = Integer.parseInt(rawPage != null ? rawPage : "1");
+            return Math.max(page, 1);
+        } catch (Exception e) {
+            return 1;
         }
     }
 
@@ -915,29 +1001,36 @@ public class MifiWebServer extends NanoHTTPD {
 
 
     @SuppressLint("Range")
-    public JSONObject getInboxJson(Context ctx, int page, int limit) throws JSONException {
+    public JSONObject getInboxJson(Context ctx, int page, int limit, String query, String filter, String category) throws JSONException {
         JSONObject response = new JSONObject();
         JSONArray res = new JSONArray();
-        Cursor c = ctx.getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, "date DESC");
-        int totalPage = 0;
+        String normalizedQuery = normalizeQuery(query);
+        String normalizedFilter = normalizeReadFilter(filter);
+        String normalizedCategory = normalizeCategory(category, true);
+        Cursor c = ctx.getContentResolver().query(
+            Uri.parse("content://sms/inbox"),
+            null,
+            buildSmsSelection(normalizedQuery, normalizedFilter),
+            buildSmsSelectionArgs(normalizedQuery, normalizedFilter),
+            "date DESC"
+        );
+        int totalMatched = 0;
+        int startIndex = (page - 1) * limit;
+        int endIndex = startIndex + limit;
         if (c != null) {
-            int countTotal = c.getCount();
-            totalPage = (int) Math.ceil((double) countTotal / limit);
-            if (c.moveToPosition((page - 1) * limit)) {
-                int count = 0;
-                do {
-                    JSONObject o = new JSONObject();
-                    o.put("id", c.getString(c.getColumnIndex("_id")));
-                    o.put("number", c.getString(c.getColumnIndex("address")));
-                    o.put("body", c.getString(c.getColumnIndex("body")));
-                    o.put("date", c.getLong(c.getColumnIndex("date")));
-                    o.put("read", c.getInt(c.getColumnIndex("read")));
+            while (c.moveToNext()) {
+                JSONObject o = createInboxMessageJson(c);
+                if (!matchesCategoryFilter(o.optString("category", CATEGORY_UNKNOWN), normalizedCategory)) {
+                    continue;
+                }
+                if (totalMatched >= startIndex && totalMatched < endIndex) {
                     res.put(o);
-                    count++;
-                } while (c.moveToNext() && count < limit);
+                }
+                totalMatched++;
             }
             c.close();
         }
+        int totalPage = totalMatched == 0 ? 0 : (int) Math.ceil((double) totalMatched / limit);
         response.put("current_page", page);
         response.put("total_page", totalPage);
         response.put("messages", res);
@@ -945,32 +1038,283 @@ public class MifiWebServer extends NanoHTTPD {
     }
 
     @SuppressLint("Range")
-    public JSONObject getOutboxJson(Context ctx, int page, int limit) throws JSONException {
+    public JSONObject getOutboxJson(Context ctx, int page, int limit, String query) throws JSONException {
         JSONObject response = new JSONObject();
         JSONArray res = new JSONArray();
-        Cursor c = ctx.getContentResolver().query(Uri.parse("content://sms/sent"), null, null, null, "date DESC");
-        int totalPage = 0;
+        String normalizedQuery = normalizeQuery(query);
+        Cursor c = ctx.getContentResolver().query(
+            Uri.parse("content://sms/sent"),
+            null,
+            buildSmsSelection(normalizedQuery, CATEGORY_ALL),
+            buildSmsSelectionArgs(normalizedQuery, CATEGORY_ALL),
+            "date DESC"
+        );
+        int totalMatched = 0;
+        int startIndex = (page - 1) * limit;
+        int endIndex = startIndex + limit;
         if (c != null) {
-            int countTotal = c.getCount();
-            totalPage = (int) Math.ceil((double) countTotal / limit);
-            if (c.moveToPosition((page - 1) * limit)) {
-                int count = 0;
-                do {
-                    JSONObject o = new JSONObject();
-                    o.put("id", c.getString(c.getColumnIndex("_id")));
-                    o.put("number", c.getString(c.getColumnIndex("address")));
-                    o.put("body", c.getString(c.getColumnIndex("body")));
-                    o.put("date", c.getLong(c.getColumnIndex("date")));
+            while (c.moveToNext()) {
+                JSONObject o = new JSONObject();
+                o.put("id", c.getString(c.getColumnIndex("_id")));
+                o.put("number", c.getString(c.getColumnIndex("address")));
+                o.put("body", c.getString(c.getColumnIndex("body")));
+                o.put("date", c.getLong(c.getColumnIndex("date")));
+                if (totalMatched >= startIndex && totalMatched < endIndex) {
                     res.put(o);
-                    count++;
-                } while (c.moveToNext() && count < limit);
+                }
+                totalMatched++;
             }
             c.close();
         }
+        int totalPage = totalMatched == 0 ? 0 : (int) Math.ceil((double) totalMatched / limit);
         response.put("current_page", page);
         response.put("total_page", totalPage);
         response.put("messages", res);
         return response;
+    }
+
+    @SuppressLint("Range")
+    private JSONObject createInboxMessageJson(Cursor c) throws JSONException {
+        JSONObject o = new JSONObject();
+        String id = c.getString(c.getColumnIndex("_id"));
+        String number = c.getString(c.getColumnIndex("address"));
+        String body = c.getString(c.getColumnIndex("body"));
+        int read = c.getInt(c.getColumnIndex("read"));
+        String manualCategory = getManualSmsCategory(id);
+        String resolvedCategory = manualCategory == null ? classifySms(number, body) : manualCategory;
+
+        o.put("id", id);
+        o.put("number", number);
+        o.put("body", body);
+        o.put("date", c.getLong(c.getColumnIndex("date")));
+        o.put("read", read);
+        o.put("category", resolvedCategory);
+        o.put("category_source", manualCategory == null ? CATEGORY_SOURCE_AUTO : CATEGORY_SOURCE_MANUAL);
+        return o;
+    }
+
+    private String normalizeQuery(String query) {
+        if (query == null) {
+            return "";
+        }
+        return query.trim();
+    }
+
+    private String normalizeReadFilter(String filter) {
+        if (filter == null) {
+            return CATEGORY_ALL;
+        }
+        String normalized = filter.trim().toLowerCase(Locale.US);
+        if ("read".equals(normalized) || "unread".equals(normalized)) {
+            return normalized;
+        }
+        return CATEGORY_ALL;
+    }
+
+    private String normalizeCategory(String category, boolean allowAll) {
+        if (category == null) {
+            return allowAll ? CATEGORY_ALL : CATEGORY_UNKNOWN;
+        }
+        String normalized = category.trim().toLowerCase(Locale.US);
+        if (CATEGORY_MARKETING.equals(normalized)
+            || CATEGORY_OTP.equals(normalized)
+            || CATEGORY_PERSONAL.equals(normalized)
+            || CATEGORY_UNKNOWN.equals(normalized)) {
+            return normalized;
+        }
+        return allowAll ? CATEGORY_ALL : CATEGORY_UNKNOWN;
+    }
+
+    private String buildSmsSelection(String query, String filter) {
+        List<String> clauses = new ArrayList<>();
+        if (!query.isEmpty()) {
+            clauses.add("(address LIKE ? OR body LIKE ?)");
+        }
+        if ("read".equals(filter)) {
+            clauses.add("read = 1");
+        } else if ("unread".equals(filter)) {
+            clauses.add("read = 0");
+        }
+        if (clauses.isEmpty()) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < clauses.size(); i++) {
+            if (i > 0) {
+                builder.append(" AND ");
+            }
+            builder.append(clauses.get(i));
+        }
+        return builder.toString();
+    }
+
+    private String[] buildSmsSelectionArgs(String query, String filter) {
+        List<String> args = new ArrayList<>();
+        if (!query.isEmpty()) {
+            String wildcardQuery = "%" + query + "%";
+            args.add(wildcardQuery);
+            args.add(wildcardQuery);
+        }
+        if (args.isEmpty()) {
+            return null;
+        }
+        return args.toArray(new String[0]);
+    }
+
+    private boolean matchesCategoryFilter(String messageCategory, String requestedCategory) {
+        return CATEGORY_ALL.equals(requestedCategory) || requestedCategory.equals(messageCategory);
+    }
+
+    private String classifySms(String number, String body) {
+        String normalizedNumber = normalizeSender(number);
+        String normalizedBody = normalizeSmsText(body);
+        int otpScore = countOtpScore(normalizedNumber, normalizedBody);
+        if (otpScore >= OTP_SCORE_THRESHOLD) {
+            return CATEGORY_OTP;
+        }
+
+        int marketingScore = countMarketingScore(normalizedNumber, normalizedBody);
+        if (marketingScore >= MARKETING_SCORE_THRESHOLD) {
+            return CATEGORY_MARKETING;
+        }
+
+        if (isNumericSender(normalizedNumber)) {
+            return CATEGORY_PERSONAL;
+        }
+
+        if (!normalizedNumber.isEmpty()) {
+            return CATEGORY_UNKNOWN;
+        }
+
+        return CATEGORY_UNKNOWN;
+    }
+
+    private String normalizeSmsText(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.trim().toLowerCase(Locale.US);
+    }
+
+    private String normalizeSender(String sender) {
+        if (sender == null) {
+            return "";
+        }
+        return sender.trim().toLowerCase(Locale.US);
+    }
+
+    private int countOtpScore(String sender, String body) {
+        int score = countKeywordScore(body, OTP_STRONG_KEYWORDS, CLASSIFICATION_STRONG_SCORE)
+            + countKeywordScore(body, OTP_SUPPORTING_KEYWORDS, CLASSIFICATION_SUPPORT_SCORE);
+
+        if (containsDigitSequence(body, 4, 8)) {
+            score += CLASSIFICATION_SUPPORT_SCORE;
+        }
+        if (containsAny(body, OTP_PROTECTIVE_PHRASES)) {
+            score += CLASSIFICATION_SUPPORT_SCORE;
+        }
+        if (isPromotionalSender(sender) && score > 0) {
+            score += CLASSIFICATION_SUPPORT_SCORE;
+        }
+        return score;
+    }
+
+    private int countMarketingScore(String sender, String body) {
+        int score = countKeywordScore(body, MARKETING_STRONG_KEYWORDS, CLASSIFICATION_STRONG_SCORE)
+            + countKeywordScore(body, MARKETING_SUPPORTING_KEYWORDS, CLASSIFICATION_SUPPORT_SCORE);
+
+        if (containsAny(body, new String[]{"http://", "https://", "www.", "bit.ly", "tinyurl"}) && score > 0) {
+            score += CLASSIFICATION_SUPPORT_SCORE;
+        }
+        if (isPromotionalSender(sender) && score > 0) {
+            score += CLASSIFICATION_SUPPORT_SCORE;
+        }
+        return score;
+    }
+
+    private boolean containsAny(String text, String[] keywords) {
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int countKeywordScore(String text, String[] keywords, int scorePerHit) {
+        int score = 0;
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                score += scorePerHit;
+            }
+        }
+        return score;
+    }
+
+    private boolean containsDigitSequence(String text, int minLength, int maxLength) {
+        int digits = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (Character.isDigit(ch)) {
+                digits++;
+                if (digits >= minLength && digits <= maxLength) {
+                    return true;
+                }
+            } else {
+                digits = 0;
+            }
+            if (digits > maxLength) {
+                digits = 0;
+            }
+        }
+        return false;
+    }
+
+    private boolean isPromotionalSender(String sender) {
+        if (sender == null || sender.isEmpty()) {
+            return false;
+        }
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        for (int i = 0; i < sender.length(); i++) {
+            char ch = sender.charAt(i);
+            if (Character.isLetter(ch)) {
+                hasLetter = true;
+            }
+            if (Character.isDigit(ch)) {
+                hasDigit = true;
+            }
+        }
+        return hasLetter && !hasDigit;
+    }
+
+    private boolean isNumericSender(String sender) {
+        if (sender == null || sender.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < sender.length(); i++) {
+            char ch = sender.charAt(i);
+            if (!Character.isDigit(ch) && ch != '+' && ch != ' ' && ch != '-' && ch != '(' && ch != ')') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getManualSmsCategory(String id) {
+        String category = prefs.getString(SMS_CATEGORY_PREFIX + id, null);
+        if (category == null) {
+            return null;
+        }
+        return normalizeCategory(category, false);
+    }
+
+    private void setManualSmsCategory(String id, String category) {
+        prefs.edit().putString(SMS_CATEGORY_PREFIX + id, normalizeCategory(category, false)).apply();
+    }
+
+    private void removeManualSmsCategory(String id) {
+        prefs.edit().remove(SMS_CATEGORY_PREFIX + id).apply();
     }
 
     public JSONObject sendSms(String n, String m) throws JSONException {
@@ -1080,6 +1424,9 @@ public class MifiWebServer extends NanoHTTPD {
                         String id = c.getString(c.getColumnIndex("_id"));
                         int d = context.getContentResolver().delete(
                             Uri.parse("content://sms/" + id), null, null);
+                        if (d > 0) {
+                            removeManualSmsCategory(id);
+                        }
                         deletedCount += d;
                     }
                     c.close();
@@ -1090,12 +1437,18 @@ public class MifiWebServer extends NanoHTTPD {
                     String id = ids.getString(i);
                     int d = context.getContentResolver().delete(
                         Uri.parse("content://sms/" + id), null, null);
+                    if (d > 0) {
+                        removeManualSmsCategory(id);
+                    }
                     deletedCount += d;
                 }
             } else if (body.has("id")) {
                 String id = body.getString("id");
                 deletedCount = context.getContentResolver().delete(
                     Uri.parse("content://sms/" + id), null, null);
+                if (deletedCount > 0) {
+                    removeManualSmsCategory(id);
+                }
             } else {
                 return result.put("status", "error").put("message", "No ID provided");
             }
@@ -1106,6 +1459,44 @@ public class MifiWebServer extends NanoHTTPD {
         }
 
         return result;
+    }
+
+    public JSONObject markSmsAsRead(JSONObject body) throws JSONException {
+        JSONObject result = new JSONObject();
+        try {
+            String id = body.optString("id", "").trim();
+            if (id.isEmpty()) {
+                return result.put("status", "error").put("message", "No ID provided");
+            }
+
+            ContentValues values = new ContentValues();
+            values.put("read", 1);
+            values.put("seen", 1);
+            int updated = context.getContentResolver().update(Uri.parse("content://sms/" + id), values, null, null);
+
+            return result.put("status", updated > 0 ? "success" : "error").put("updated", updated);
+        } catch (Exception e) {
+            return result.put("status", "error").put("message", e.getMessage());
+        }
+    }
+
+    public JSONObject setSmsCategory(JSONObject body) throws JSONException {
+        JSONObject result = new JSONObject();
+        try {
+            String id = body.optString("id", "").trim();
+            if (id.isEmpty()) {
+                return result.put("status", "error").put("message", "No ID provided");
+            }
+
+            String category = normalizeCategory(body.optString("category", CATEGORY_UNKNOWN), false);
+            setManualSmsCategory(id, category);
+            return result.put("status", "success")
+                .put("id", id)
+                .put("category", category)
+                .put("category_source", CATEGORY_SOURCE_MANUAL);
+        } catch (Exception e) {
+            return result.put("status", "error").put("message", e.getMessage());
+        }
     }
 
     public JSONObject getCallbackSettings() throws JSONException {

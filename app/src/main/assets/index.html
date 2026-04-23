@@ -18,11 +18,29 @@
                     <div class="modal-info">
                         <div class="modal-number" id="modal-number">081234567890</div>
                         <div class="modal-date" id="modal-date">14:30</div>
+                        <div class="modal-meta-row">
+                            <span class="sms-category-badge" id="modal-category">Unknown</span>
+                        </div>
                     </div>
                     <button class="modal-close" id="modal-close">×</button>
                 </div>
                 <div class="modal-body" id="modal-body">
                     Full message content here...
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-category-row">
+                        <label for="modal-category-select" id="modal-category-label">Category</label>
+                        <select id="modal-category-select" class="form-select">
+                            <option value="marketing">Marketing</option>
+                            <option value="otp">OTP</option>
+                            <option value="personal">Personal</option>
+                            <option value="unknown">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-danger" id="modal-delete-btn">Delete</button>
+                        <button type="button" class="btn btn-primary" id="modal-reply-btn">Reply</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -228,6 +246,46 @@
 
                     <!-- Inbox Tab -->
                     <div id="sms-tab-inbox" class="sms-tab-content active">
+                        <div class="sms-filter-grid">
+                            <div class="sms-search-group sms-search-group-inbox">
+                                <input type="search" id="inbox-search" class="sms-search-input" placeholder="Cari inbox...">
+                                <button type="button" class="btn btn-sm btn-secondary" id="inbox-clear-search">Clear</button>
+                                <button type="button" class="btn btn-sm btn-secondary sms-filter-trigger" id="inbox-filter-trigger" aria-expanded="false">
+                                    <span id="inbox-filter-trigger-label">Filter</span>
+                                    <span class="sms-filter-badge" id="inbox-filter-count" style="display:none;">0</span>
+                                </button>
+                            </div>
+                            <div class="sms-filter-popover" id="inbox-filter-panel" style="display:none;">
+                                <div class="sms-filter-popover-header">
+                                    <strong id="inbox-filter-title">Filter</strong>
+                                </div>
+                                <div class="sms-filter-panel-body">
+                                    <div class="sms-filter-field">
+                                        <label for="inbox-filter-draft" id="inbox-filter-label">Status</label>
+                                        <select id="inbox-filter-draft" class="form-select sms-filter-select">
+                                            <option value="all">All</option>
+                                            <option value="unread">Unread</option>
+                                            <option value="read">Read</option>
+                                        </select>
+                                    </div>
+                                    <div class="sms-filter-field">
+                                        <label for="inbox-category-filter-draft" id="inbox-category-filter-label">Category</label>
+                                        <select id="inbox-category-filter-draft" class="form-select sms-filter-select">
+                                            <option value="all">All Categories</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="otp">OTP</option>
+                                            <option value="personal">Personal</option>
+                                            <option value="unknown">Unknown</option>
+                                        </select>
+                                    </div>
+                                    <div class="sms-filter-actions">
+                                        <button type="button" class="btn btn-sm btn-secondary" id="inbox-filter-reset">Reset</button>
+                                        <button type="button" class="btn btn-sm btn-primary" id="inbox-filter-apply">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sms-filter-backdrop" id="inbox-filter-backdrop" style="display:none;"></div>
                         <div class="sms-toolbar">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="inbox-select-all">
@@ -250,6 +308,12 @@
 
                     <!-- Outbox Tab -->
                     <div id="sms-tab-outbox" class="sms-tab-content">
+                        <div class="sms-filter-grid">
+                            <div class="sms-search-group">
+                                <input type="search" id="outbox-search" class="sms-search-input" placeholder="Cari outbox...">
+                                <button type="button" class="btn btn-sm btn-secondary" id="outbox-clear-search">Clear</button>
+                            </div>
+                        </div>
                         <div class="sms-toolbar">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="outbox-select-all">
@@ -276,13 +340,14 @@
                             <div class="card-body">
                                 <form id="sms-form">
                                     <div class="form-group">
-                                        <label>Nomor Tujuan</label>
+                                        <label id="sms-number-label">Nomor Tujuan</label>
                                         <input type="tel" id="sms-number" placeholder="08xxxxxxxxxx" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Pesan</label>
+                                        <label id="sms-message-label">Pesan</label>
                                         <textarea id="sms-message" placeholder="Tulis pesan..." rows="5" required></textarea>
                                         <div class="char-count"><span id="sms-char-count">0</span>/160</div>
+                                        <div class="sms-segment-info" id="sms-segment-info">1 segment</div>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-block" id="send-sms-btn">
                                         <span class="btn-text">Kirim SMS</span>

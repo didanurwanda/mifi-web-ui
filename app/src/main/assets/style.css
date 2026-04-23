@@ -1049,6 +1049,114 @@ body {
     gap: 12px;
 }
 
+.sms-filter-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.sms-search-group {
+    display: flex;
+    gap: 8px;
+}
+
+.sms-search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--white);
+}
+
+.sms-filter-row {
+    display: flex;
+    gap: 8px;
+}
+
+.sms-search-group-inbox {
+    align-items: center;
+}
+
+.sms-filter-trigger {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.sms-filter-trigger.active {
+    color: var(--primary);
+    border-color: rgba(37, 99, 235, 0.35);
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.sms-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.sms-filter-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(320px, 100%);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    z-index: 20;
+    overflow: hidden;
+}
+
+.sms-filter-popover-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-900);
+}
+
+.sms-filter-panel-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sms-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sms-filter-field label {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.sms-filter-select {
+    flex: 1;
+}
+
+.sms-filter-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.sms-filter-backdrop {
+    display: none;
+}
+
 .sms-item {
     background: var(--white);
     border-radius: var(--radius-lg);
@@ -1172,6 +1280,63 @@ body {
 .sms-item.selected {
     background: var(--gray-50);
     border-color: var(--primary);
+}
+
+.sms-item.unread {
+    border-color: rgba(37, 99, 235, 0.25);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+}
+
+.sms-item.unread .sms-number {
+    color: var(--primary);
+}
+
+.sms-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.sms-category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    text-transform: capitalize;
+}
+
+.sms-category-badge.marketing {
+    background: rgba(249, 115, 22, 0.12);
+    color: #c2410c;
+}
+
+.sms-category-badge.otp {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+}
+
+.sms-category-badge.personal {
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+}
+
+.sms-category-badge.unknown {
+    background: rgba(107, 114, 128, 0.14);
+    color: var(--gray-600);
+}
+
+.sms-unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
 }
 
 .pagination {
@@ -1343,6 +1508,44 @@ body {
     word-break: break-word;
 }
 
+.modal-meta-row {
+    margin-top: 6px;
+}
+
+.modal-footer {
+    padding: 16px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-category-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-category-row label {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.modal-actions .btn {
+    flex: 1;
+}
+
+.sms-segment-info {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
 /* Setting Page */
 .setting-desc {
     color: var(--gray-600);
@@ -1394,6 +1597,45 @@ body {
 }
 
 @media (max-width: 480px) {
+    .sms-search-group,
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .sms-search-group-inbox {
+        align-items: stretch;
+    }
+
+    .sms-filter-trigger {
+        width: 100%;
+    }
+
+    .sms-filter-popover {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        top: auto;
+        width: auto;
+        border-radius: 20px;
+        z-index: 1002;
+    }
+
+    .sms-filter-actions {
+        flex-direction: column;
+    }
+
+    .sms-filter-actions .btn {
+        width: 100%;
+    }
+
+    .sms-filter-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.4);
+        z-index: 1001;
+    }
+
     .sms-tab {
         padding: 8px 10px;
         font-size: 13px;

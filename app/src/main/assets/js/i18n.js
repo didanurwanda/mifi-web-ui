@@ -122,19 +122,40 @@ const I18N = {
         this.applyToSelector('#inbox-delete-all', 'sms.delete_all');
         this.applyToSelector('#outbox-delete-selected', 'sms.delete_selected');
         this.applyToSelector('#outbox-delete-all', 'sms.delete_all');
-        this.applyToSelector('#sms-tab-compose label[for="sms-number"], #sms-tab-compose .form-group label', 'sms.destination_number');
+        this.applyPlaceholder('#inbox-search', 'sms.search_inbox_placeholder');
+        this.applyPlaceholder('#outbox-search', 'sms.search_outbox_placeholder');
+        this.applyToSelector('#inbox-clear-search', 'sms.clear_search');
+        this.applyToSelector('#outbox-clear-search', 'sms.clear_search');
+        this.applyToSelector('#inbox-filter-trigger-label', 'sms.filter');
+        this.applyToSelector('#inbox-filter-title', 'sms.filter');
+        this.applyToSelector('#inbox-filter-label', 'sms.filter_status');
+        this.applyToSelector('#inbox-category-filter-label', 'sms.filter_category');
+        this.applyToSelector('#inbox-filter-reset', 'sms.reset_filter');
+        this.applyToSelector('#inbox-filter-apply', 'sms.apply_filter');
         this.applyPlaceholder('#sms-number', 'sms.destination_placeholder');
         this.applyPlaceholder('#sms-message', 'sms.message_placeholder');
         this.applyToSelector('#send-sms-btn .btn-text', 'sms.send');
         this.applyToSelector('.sms-tab[data-tab="compose"]', 'sms.compose');
         this.applyToSelector('#inbox-page-info', 'sms.page', { page: 1, total: 1 });
         this.applyToSelector('#outbox-page-info', 'sms.page', { page: 1, total: 1 });
+        this.applyToSelector('#sms-number-label', 'sms.destination_number');
+        this.applyToSelector('#sms-message-label', 'sms.message');
+        this.applyToSelector('#sms-segment-info', 'sms.segment_count', { count: 1 });
+        this.applyToSelector('#modal-category-label', 'sms.category');
+        this.applyToSelector('#modal-delete-btn', 'sms.delete');
+        this.applyToSelector('#modal-reply-btn', 'sms.reply');
 
-        const labels = document.querySelectorAll('#sms-tab-compose .form-group label');
-        if (labels.length >= 2) {
-            labels[0].textContent = this.t('sms.destination_number');
-            labels[1].textContent = this.t('sms.message');
+        const inboxFilterOptions = document.querySelectorAll('#inbox-filter-draft option');
+        if (inboxFilterOptions.length >= 3) {
+            inboxFilterOptions[0].textContent = this.t('sms.filter_all');
+            inboxFilterOptions[1].textContent = this.t('sms.filter_unread');
+            inboxFilterOptions[2].textContent = this.t('sms.filter_read');
         }
+
+        const categoryOptions = document.querySelectorAll('#inbox-category-filter-draft option, #modal-category-select option');
+        categoryOptions.forEach((option) => {
+            option.textContent = this.t('sms.category_' + option.value);
+        });
 
         this.applyToSelector('#page-settings .password-card .card-header h2', 'password.title');
         this.applyToSelector('#change-pass-btn .btn-text', 'password.save');
